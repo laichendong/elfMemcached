@@ -1,0 +1,7 @@
+#ignore class files
+bin/
+
+#ignore myEclipse/eclipse config files
+.settings/
+.classpath
+.project
