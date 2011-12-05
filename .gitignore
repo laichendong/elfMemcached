@@ -5,3 +5,7 @@ bin/
 .settings/
 .classpath
 .project
+
+#ignore package files
+*.war
+
