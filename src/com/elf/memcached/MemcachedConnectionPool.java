@@ -6,6 +6,7 @@ package com.elf.memcached;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -27,7 +28,7 @@ public class MemcachedConnectionPool {
 	public static final int DEFAULT_MIN_IDLE = 8;
 	/** 默认最长等待时间，ms为单位 */
 	public static final long DEFAULT_MAX_WAIT = 1000L;
-
+	
 	/** 最大激活连接数 */
 	private int maxActive = DEFAULT_MAX_ACTIVE;
 	/** 最大空闲连接数 */
@@ -36,7 +37,7 @@ public class MemcachedConnectionPool {
 	private int minIdle = DEFAULT_MIN_IDLE;
 	/** 最长等待时间，ms为单位 */
 	private long maxWait = DEFAULT_MAX_WAIT;
-
+	
 	/** 服务器ID列表，可以为IP或host name */
 	private String[] servers;
 	/** 对应到每个服务器的连接池Map */
@@ -47,13 +48,24 @@ public class MemcachedConnectionPool {
 	private static Logger logger = Logger.getLogger(MemcachedConnectionPool.class);
 	/** MD5实例 */
 	private MessageDigest md5 = null;
-
+	
+	/**
+	 * 默认构造方法，之后应该使用 setServers(String[] servers) 方法设置服务器列表
+	 */
 	public MemcachedConnectionPool() {
-		if (!this.initialized) {
-			this.initialize();
-		}
+		
 	}
-
+	
+	/**
+	 * 指定服务器列表的构造方法
+	 * 
+	 * @param servers
+	 *            服务器列表
+	 */
+	public MemcachedConnectionPool(String servers[]) {
+		this.servers = servers;
+	}
+	
 	/**
 	 * 初始化连接池 如果服务器列表为空，将抛出IllegalStateException异常 正常初始化后 initialized将设置成true
 	 */
@@ -76,9 +88,11 @@ public class MemcachedConnectionPool {
 			initialized = true;
 		} catch (Exception e) {
 			initialized = false;
+			logger.error("不能获取与服务器的连接，连接池初始化失败。", e);
+			throw new IllegalStateException("不能获取与服务器的连接，连接池初始化失败。", e);
 		}
 	}
-
+	
 	/**
 	 * 获取socket连接
 	 * 
@@ -87,8 +101,9 @@ public class MemcachedConnectionPool {
 	 * @return 到对应服务器的socket连接
 	 */
 	public Socket getConnection(String key) {
-		if(!this.initialized){ // 检查连接池是否初始化
-			this.initialize();
+		if (!this.initialized) { // 检查连接池是否初始化
+			logger.error("试图从一个没有初始化的连接池里获取连接");
+			throw new IllegalStateException("试图从一个没有初始化的连接池里获取连接");
 		}
 		
 		long hash = md5HashingAlg(key);
@@ -101,7 +116,24 @@ public class MemcachedConnectionPool {
 		}
 		return connection;
 	}
-
+	
+	/**
+	 * 关闭连接池
+	 */
+	public void close() {
+		this.servers = null;
+		for (Entry<String, GenericObjectPool> pool : this.pools.entrySet()) {
+			try {
+				pool.getValue().close();
+			} catch (Exception e) {
+				// 沉默是金
+			}
+		}
+		this.pools.clear();
+		this.pools = null;
+		this.initialized = false;
+	}
+	
 	/**
 	 * 基于MD5的hash算法
 	 * 
@@ -118,13 +150,13 @@ public class MemcachedConnectionPool {
 				throw new IllegalStateException("系统没有提供MD5算法。");
 			}
 		}
-
+		
 		md5.reset();
 		md5.update(key.getBytes());
 		byte[] bKey = md5.digest();
-		long res = ((long) (bKey[3] & 0xFF) << 24) | ((long) (bKey[2] & 0xFF) << 16) | ((long) (bKey[1] & 0xFF) << 8)
+		long hash = ((long) (bKey[3] & 0xFF) << 24) | ((long) (bKey[2] & 0xFF) << 16) | ((long) (bKey[1] & 0xFF) << 8)
 				| (long) (bKey[0] & 0xFF);
-		return res;
+		return hash;
 	}
-
+	
 }

@@ -24,15 +24,17 @@ public class MemcachedConnenctionFactory extends BasePoolableObjectFactory {
 	private int port;
 	/** 日志记录器 */
 	private Logger logger = Logger.getLogger(MemcachedConnenctionFactory.class);
-
+	
 	/**
 	 * 构造方法
-	 * @param hostProfile 服务器特征字符串， 主机名:端口或只有主机名
+	 * 
+	 * @param hostProfile
+	 *            服务器特征字符串， 主机名:端口或只有主机名
 	 */
 	public MemcachedConnenctionFactory(String hostProfile) {
 		if (hostProfile == null || hostProfile.isEmpty()) {
 			logger.error("试图对一个为未指定主机创建连接。");
-			throw new IllegalStateException("试图对一个为未指定主机创建连接。");
+			throw new InvalidParameterException("试图对一个为未指定主机创建连接。");
 		}
 		int colonPosition = hostProfile.indexOf(":");
 		if (colonPosition > 0) { // 有指定端口号,且端口号之前至少有一个字母表示主机地址。
@@ -46,15 +48,15 @@ public class MemcachedConnenctionFactory extends BasePoolableObjectFactory {
 		} else if (colonPosition == -1) { // 没有指定端口号，使用默认端口号
 			this.port = DEFAULT_PORT;
 			this.host = hostProfile;
-		} else if (colonPosition == 0){ // 以冒号开头，错误hostProfile的格式
+		} else if (colonPosition == 0) { // 以冒号开头，错误hostProfile的格式
 			logger.error("以冒号开头，错误hostProfile的格式。");
 			throw new InvalidParameterException("以冒号开头，错误hostProfile的格式。");
 		}
 	}
-
+	
 	@Override
 	public Object makeObject() throws Exception {
 		return new Socket(host, port);
 	}
-
+	
 }
