@@ -7,5 +7,4 @@ bin/
 .project
 
 #ignore package files
-*.war
 
