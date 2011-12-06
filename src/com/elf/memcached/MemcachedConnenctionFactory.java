@@ -24,6 +24,8 @@ public class MemcachedConnenctionFactory extends BasePoolableObjectFactory {
 	private int port;
 	/** 日志记录器 */
 	private Logger logger = Logger.getLogger(MemcachedConnenctionFactory.class);
+	/** 服务器特征字符串，标识与之对应的服务器上的socket连接池 */
+	private String hostProfile;
 	
 	/**
 	 * 构造方法
@@ -45,18 +47,36 @@ public class MemcachedConnenctionFactory extends BasePoolableObjectFactory {
 				throw new InvalidParameterException("指定的端口号不是数字。");
 			}
 			this.host = hostProfile.substring(0, colonPosition);
+			this.hostProfile = hostProfile;
 		} else if (colonPosition == -1) { // 没有指定端口号，使用默认端口号
 			this.port = DEFAULT_PORT;
 			this.host = hostProfile;
+			this.hostProfile = hostProfile;
 		} else if (colonPosition == 0) { // 以冒号开头，错误hostProfile的格式
 			logger.error("以冒号开头，错误hostProfile的格式。");
 			throw new InvalidParameterException("以冒号开头，错误hostProfile的格式。");
 		}
 	}
 	
+	/**
+	 * 创建一个Memcached连接对象
+	 * @see org.apache.commons.pool.BasePoolableObjectFactory#makeObject()
+	 */
 	@Override
 	public Object makeObject() throws Exception {
-		return new Socket(host, port);
+		MemcachedConnection conn = new MemcachedConnection(new Socket(host, port), hostProfile);
+		return conn;
+	}
+
+	/**
+	 * 销毁一个Memcached连接对象，会关闭和服务器间的socket连接
+	 * @see org.apache.commons.pool.BasePoolableObjectFactory#destroyObject(java.lang.Object)
+	 */
+	@Override
+	public void destroyObject(Object obj) throws Exception {
+		super.destroyObject(obj);
+		MemcachedConnection conn = (MemcachedConnection) obj;
+		conn.getSocket().close();
 	}
 	
 }

@@ -3,8 +3,6 @@
  */
 package com.elf.memcached;
 
-import java.net.Socket;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -43,7 +41,7 @@ public class MemcachedConnectionPoolTest {
 	 */
 	@Test
 	public void getConnectionTest() {
-		Socket conn = pool.getConnection("laichendong");
-		Assert.assertTrue(conn.isConnected());
+		MemcachedConnection conn = pool.getConnection("laichendong");
+		Assert.assertTrue(conn.getSocket().isConnected());
 	}
 }

@@ -3,7 +3,6 @@
  */
 package com.elf.memcached;
 
-import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map.Entry;
@@ -76,14 +75,14 @@ public class MemcachedConnectionPool {
 		}
 		try {
 			this.pools = new ConcurrentHashMap<String, GenericObjectPool>();
-			for (String server : this.servers) {
-				GenericObjectPool poolOnOneServer = new GenericObjectPool(new MemcachedConnenctionFactory(server));
+			for (String hostProfile : this.servers) {
+				GenericObjectPool poolOnOneServer = new GenericObjectPool(new MemcachedConnenctionFactory(hostProfile));
 				poolOnOneServer.setMaxActive(this.maxActive);
 				poolOnOneServer.setWhenExhaustedAction((byte) 1);
 				poolOnOneServer.setMaxWait(this.maxWait);
 				poolOnOneServer.setMaxIdle(this.maxIdle);
 				poolOnOneServer.setMinIdle(this.minIdle);
-				pools.putIfAbsent(server, poolOnOneServer);
+				pools.putIfAbsent(hostProfile, poolOnOneServer);
 			}
 			initialized = true;
 		} catch (Exception e) {
@@ -94,23 +93,23 @@ public class MemcachedConnectionPool {
 	}
 	
 	/**
-	 * 获取socket连接
+	 * 获取一个可用的socket连接
 	 * 
 	 * @param key
 	 *            获取连接的key
 	 * @return 到对应服务器的socket连接
 	 */
-	public Socket getConnection(String key) {
+	public MemcachedConnection getConnection(String key) {
 		if (!this.initialized) { // 检查连接池是否初始化
 			logger.error("试图从一个没有初始化的连接池里获取连接");
 			throw new IllegalStateException("试图从一个没有初始化的连接池里获取连接");
 		}
 		
 		long hash = md5HashingAlg(key);
-		Socket connection = null;
+		MemcachedConnection connection = null;
 		GenericObjectPool poolOnTheServer = pools.get(servers[(int) (hash % servers.length)]);
 		try {
-			connection = (Socket) poolOnTheServer.borrowObject();
+			connection = (MemcachedConnection) poolOnTheServer.borrowObject();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -157,6 +156,21 @@ public class MemcachedConnectionPool {
 		long hash = ((long) (bKey[3] & 0xFF) << 24) | ((long) (bKey[2] & 0xFF) << 16) | ((long) (bKey[1] & 0xFF) << 8)
 				| (long) (bKey[0] & 0xFF);
 		return hash;
+	}
+
+	/**
+	 * 客户端用完连接后，调用该方法释放连接
+	 * @param conn 待释放的连接
+	 */
+	public void releaseConnection(MemcachedConnection conn) {
+		String hostProfile = conn.getHostProfile();
+		GenericObjectPool poolOnTheServer = pools.get(hostProfile);
+		try {
+			poolOnTheServer.returnObject(conn);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 }
