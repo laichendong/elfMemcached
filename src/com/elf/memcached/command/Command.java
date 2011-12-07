@@ -5,6 +5,7 @@ package com.elf.memcached.command;
 
 /**
  * 抽象的命令。发往memcached服务器的命令，都应该继承自这个类
+ * memcached 文本协议：https://github.com/memcached/memcached/blob/master/doc/protocol.txt
  * 
  * @author laichendong
  * @since 2011-12-6 下午02:15:34

@@ -3,7 +3,13 @@
  */
 package com.elf.memcached;
 
+import java.io.IOException;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+
+import com.elf.memcached.command.Command;
+import com.elf.memcached.command.StorageCommand;
+import com.elf.memcached.command.StorageCommand.CommandNames;
 
 /**
  * memcach 连接对象
@@ -43,6 +49,28 @@ public class MemcachedConnection {
 	
 	public void setHostProfile(String hostProfile) {
 		this.hostProfile = hostProfile;
+	}
+	
+	/**
+	 * 存储数据
+	 * 
+	 * @param commandName
+	 *            存储命令名称
+	 * @param key
+	 *            待存储的key
+	 * @param value
+	 *            待存储的数据值
+	 * @return
+	 */
+	public boolean storage(CommandNames commandName, String key, Object value) {
+		Command cmd = new StorageCommand(commandName, key, value);
+		ByteBuffer src = null;
+		try {
+			this.socket.getChannel().write(src);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 	
 }

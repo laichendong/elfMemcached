@@ -6,6 +6,8 @@ package com.elf.memcached;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
+import com.elf.memcached.command.StorageCommand;
+
 /**
  * @author laichendong
  */
@@ -33,10 +35,11 @@ public class MemcachedClient {
 	 * @return
 	 */
 	public boolean set(String key, Object value) {
+		boolean successed = false;
 		MemcachedConnection conn = connectionPool.getConnection(key);
-		//do something
+		successed = conn.storage(StorageCommand.CommandNames.SET, key, value);
 		connectionPool.releaseConnection(conn);
-		return false;
+		return successed;
 	}
 	
 	/**
