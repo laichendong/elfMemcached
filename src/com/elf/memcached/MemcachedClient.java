@@ -48,7 +48,10 @@ public class MemcachedClient {
 	 * @throws UnknownHostException
 	 */
 	public static void main(String[] args) {
-		
+		MemcachedConnectionPool connectionPool = new MemcachedConnectionPool(new String[]{"127.0.0.1:11211"});
+		connectionPool.initialize();
+		MemcachedClient c = new MemcachedClient(connectionPool);
+		c.set("lai", "chendong");
 	}
 	
 }

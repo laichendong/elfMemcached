@@ -3,7 +3,9 @@
  */
 package com.elf.memcached;
 
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.channels.SocketChannel;
 import java.security.InvalidParameterException;
 
 import org.apache.commons.pool.BasePoolableObjectFactory;
@@ -26,7 +28,7 @@ public class MemcachedConnenctionFactory extends BasePoolableObjectFactory {
 	private Logger logger = Logger.getLogger(MemcachedConnenctionFactory.class);
 	/** 服务器特征字符串，标识与之对应的服务器上的socket连接池 */
 	private String hostProfile;
-	
+
 	/**
 	 * 构造方法
 	 * 
@@ -57,19 +59,24 @@ public class MemcachedConnenctionFactory extends BasePoolableObjectFactory {
 			throw new InvalidParameterException("以冒号开头，错误hostProfile的格式。");
 		}
 	}
-	
+
 	/**
 	 * 创建一个Memcached连接对象
+	 * 
 	 * @see org.apache.commons.pool.BasePoolableObjectFactory#makeObject()
 	 */
 	@Override
 	public Object makeObject() throws Exception {
-		MemcachedConnection conn = new MemcachedConnection(new Socket(host, port), hostProfile);
+		SocketChannel localSocketChannel = SocketChannel.open();
+		localSocketChannel.socket().connect(new InetSocketAddress(host, port));
+		Socket socket = localSocketChannel.socket();
+		MemcachedConnection conn = new MemcachedConnection(socket, hostProfile);
 		return conn;
 	}
 
 	/**
 	 * 销毁一个Memcached连接对象，会关闭和服务器间的socket连接
+	 * 
 	 * @see org.apache.commons.pool.BasePoolableObjectFactory#destroyObject(java.lang.Object)
 	 */
 	@Override
@@ -78,5 +85,5 @@ public class MemcachedConnenctionFactory extends BasePoolableObjectFactory {
 		MemcachedConnection conn = (MemcachedConnection) obj;
 		conn.getSocket().close();
 	}
-	
+
 }

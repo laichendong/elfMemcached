@@ -27,13 +27,37 @@ public class StorageCommand extends Command {
 	/** 一个通知server不用返回响应结果的可选参数。如果请求命令错误，server不能正确识别noreply，仍然会返回error。 */
 	private boolean noreply;
 	/** 数据 */
-	private Object data;
+	private byte[] data;
 	
 	public StorageCommand(CommandNames commandName, String key, Object value) {
 		this.commandName = commandName;
 		this.key = key;
 		this.flags = 0;
 		this.exptime = 0;
+		this.noreply = false;
+		this.data = super.serialize(value);
+		this.bytes = this.data.length;
+	}
+	
+	@Override
+	public String commandString(){
+		StringBuffer cmd = new StringBuffer();
+		cmd.append(this.commandName.name);
+		cmd.append(DELIMITER);
+		cmd.append(this.key);
+		cmd.append(DELIMITER);
+		cmd.append(this.flags);
+		cmd.append(DELIMITER);
+		cmd.append(this.exptime);
+		cmd.append(DELIMITER);
+		cmd.append(this.bytes);
+		cmd.append(DELIMITER);
+		if(this.noreply){
+			cmd.append("noreply");
+			cmd.append(DELIMITER);
+		}
+		cmd.append(RETURN);
+		return cmd.toString();
 	}
 	
 	/**
@@ -58,6 +82,62 @@ public class StorageCommand extends Command {
 		public void setName(String name) {
 			this.name = name;
 		}
+	}
+
+	public CommandNames getCommandName() {
+		return commandName;
+	}
+
+	public void setCommandName(CommandNames commandName) {
+		this.commandName = commandName;
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
+	}
+
+	public short getFlags() {
+		return flags;
+	}
+
+	public void setFlags(short flags) {
+		this.flags = flags;
+	}
+
+	public long getExptime() {
+		return exptime;
+	}
+
+	public void setExptime(long exptime) {
+		this.exptime = exptime;
+	}
+
+	public int getBytes() {
+		return bytes;
+	}
+
+	public void setBytes(int bytes) {
+		this.bytes = bytes;
+	}
+
+	public boolean isNoreply() {
+		return noreply;
+	}
+
+	public void setNoreply(boolean noreply) {
+		this.noreply = noreply;
+	}
+
+	public byte[] getData() {
+		return data;
+	}
+
+	public void setData(byte[] data) {
+		this.data = data;
 	}
 	
 }

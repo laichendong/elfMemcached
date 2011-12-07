@@ -3,9 +3,15 @@
  */
 package com.elf.memcached;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+
+import org.apache.log4j.net.SocketAppender;
 
 import com.elf.memcached.command.Command;
 import com.elf.memcached.command.StorageCommand;
@@ -63,10 +69,24 @@ public class MemcachedConnection {
 	 * @return
 	 */
 	public boolean storage(CommandNames commandName, String key, Object value) {
-		Command cmd = new StorageCommand(commandName, key, value);
-		ByteBuffer src = null;
+		StorageCommand cmd = new StorageCommand(commandName, key, value);
+		byte[] c = cmd.commandString().getBytes();
+		ByteBuffer buffer = ByteBuffer.allocateDirect(c.length);
+		buffer.put(c);
 		try {
-			this.socket.getChannel().write(src);
+			this.socket.getChannel().write(buffer);
+			for(int i=0; i<cmd.getData().length; i+= buffer.capacity()){
+				buffer.clear();
+				buffer.put(cmd.getData());
+				this.socket.getChannel().write(buffer);
+			}
+			buffer.clear();
+			buffer.put(Command.RETURN.getBytes());
+			this.socket.getChannel().write(buffer);
+			
+			
+			System.out.println(new BufferedReader( new InputStreamReader(this.socket.getInputStream())).readLine());
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
