@@ -6,6 +6,7 @@ package com.elf.memcached;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.Socket;
@@ -70,21 +71,16 @@ public class MemcachedConnection {
 	 */
 	public boolean storage(CommandNames commandName, String key, Object value) {
 		StorageCommand cmd = new StorageCommand(commandName, key, value);
+		System.out.println(cmd.commandString());
 		byte[] c = cmd.commandString().getBytes();
-		ByteBuffer buffer = ByteBuffer.allocateDirect(c.length);
-		buffer.put(c);
 		try {
-			this.socket.getChannel().write(buffer);
-			for(int i=0; i<cmd.getData().length; i+= buffer.capacity()){
-				buffer.clear();
-				buffer.put(cmd.getData());
-				this.socket.getChannel().write(buffer);
-			}
-			buffer.clear();
-			buffer.put(Command.RETURN.getBytes());
-			this.socket.getChannel().write(buffer);
+			OutputStream os = this.socket.getOutputStream();
+			os.write(c);
+			os.write(cmd.getData());
+			os.write(Command.RETURN.getBytes());
+			os.flush();
 			
-			
+			//TODO 这步非常耗性能！
 			System.out.println(new BufferedReader( new InputStreamReader(this.socket.getInputStream())).readLine());
 			
 		} catch (IOException e) {
