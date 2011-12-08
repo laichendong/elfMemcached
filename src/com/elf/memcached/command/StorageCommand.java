@@ -10,28 +10,33 @@ package com.elf.memcached.command;
  * @since 2011-12-6 下午05:58:28
  * @TODO cas
  */
-public class StorageCommand extends Command {
-	/** 命令名称 */
-	private CommandNames commandName;
-	/** client用于存储data的键 */
+public final class StorageCommand extends Command {
+	/** 待存储的key */
 	private String key;
-	/**
-	 * 是一个16位的无符号int，server会存储并在以后取数据时返回给client。该值用于保存data存储相关信息，对server是透明的。注意从memcached
-	 * 1.2.1之后，改用32位int存储，不过你可以强制使用16位，以兼容之前版本。
-	 */
+	/** 标志位 1.2.1后改用32位 为了兼容老版本，这里依然使用16位 */
 	private short flags;
-	/** 过期时间，如果设置为0则表示永不过期（但是仍然可能被删除以为新元素腾出空间）。它是一个非负数，保证在过期后，client不再会取到该值。 */
+	/** 过期时间,exptime >= 0 ; 0表示不过期 */
 	private long exptime;
 	/** 数据块的字节数，不包括\r\n。可以为0，表示value为空。 */
 	private int bytes;
-	/** 一个通知server不用返回响应结果的可选参数。如果请求命令错误，server不能正确识别noreply，仍然会返回error。 */
-	private boolean noreply;
-	/** 数据 */
+	
+	/** 待存储的数据 */
 	private byte[] data;
 	
+	/**
+	 * 构造方法
+	 * 
+	 * @param commandName
+	 *            命令名称
+	 * @param key
+	 *            待存储的key
+	 * @param value
+	 *            待存储的值
+	 */
 	public StorageCommand(CommandNames commandName, String key, Object value) {
+//		new StorageCommand(commandName, key, value, 0, false);
 		this.commandName = commandName;
-		this.key = key;
+		this.key = key; // TODO 使key“无害”
 		this.flags = 0;
 		this.exptime = 0;
 		this.noreply = false;
@@ -39,8 +44,61 @@ public class StorageCommand extends Command {
 		this.bytes = this.data.length;
 	}
 	
+	/**
+	 * 构造方法
+	 * 
+	 * @param commandName
+	 *            命令名称
+	 * @param key
+	 *            待存储的key
+	 * @param value
+	 *            待存储的value
+	 * @param exptime
+	 *            过期时间
+	 */
+	public StorageCommand(CommandNames commandName, String key, Object value, long exptime) {
+//		new StorageCommand(commandName, key, value, exptime, false);
+		this.commandName = commandName;
+		this.key = key; // TODO 使key“无害”
+		this.flags = 0;
+		this.exptime = exptime;
+		this.noreply = false;
+		this.data = super.serialize(value);
+		this.bytes = this.data.length;
+	}
+	
+	/**
+	 * 构造方法
+	 * 
+	 * @param commandName
+	 *            命令名称
+	 * @param key
+	 *            待存储的key
+	 * @param value
+	 *            待存储的value
+	 * @param exptime
+	 *            过期时间
+	 * @param noreply
+	 *            是否不需要答复
+	 */
+	public StorageCommand(CommandNames commandName, String key, Object value, long exptime, boolean noreply) {
+		// TODO 参数合法性检查
+		// TODO 序列化方式的选择和优化，java原生/json。 可用flags字段做标记
+		this.commandName = commandName;
+		this.key = key; // TODO 使key“无害”
+		this.flags = 0;
+		this.exptime = exptime;
+		this.noreply = noreply;
+		this.data = super.serialize(value);
+		this.bytes = this.data.length;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.elf.memcached.command.Command#commandString()
+	 */
 	@Override
-	public String commandString(){
+	public String commandString() {
 		StringBuffer cmd = new StringBuffer();
 		cmd.append(this.commandName.name);
 		cmd.append(DELIMITER);
@@ -52,90 +110,51 @@ public class StorageCommand extends Command {
 		cmd.append(DELIMITER);
 		cmd.append(this.bytes);
 		cmd.append(DELIMITER);
-		if(this.noreply){
-			cmd.append("noreply");
+		if (this.noreply) {
+			cmd.append(NOREPLY);
 			cmd.append(DELIMITER);
 		}
 		cmd.append(RETURN);
 		return cmd.toString();
 	}
 	
-	/**
-	 * 存储命令包含的命令名称枚举
-	 * 
-	 * @author laichendong
-	 * @since 2011-12-6 下午06:01:13
-	 */
-	public enum CommandNames {
-		SET("set"), ADD("add"), REPLACE("replace"), APPEND("append"), PREPEND("prepend");
-		/** 命令名称 */
-		String name;
-		
-		CommandNames(String name) {
-			this.name = name;
-		}
-		
-		public String getName() {
-			return name;
-		}
-		
-		public void setName(String name) {
-			this.name = name;
-		}
-	}
-
-	public CommandNames getCommandName() {
-		return commandName;
-	}
-
-	public void setCommandName(CommandNames commandName) {
-		this.commandName = commandName;
-	}
-
+	
 	public String getKey() {
 		return key;
 	}
-
+	
 	public void setKey(String key) {
 		this.key = key;
 	}
-
+	
 	public short getFlags() {
 		return flags;
 	}
-
+	
 	public void setFlags(short flags) {
 		this.flags = flags;
 	}
-
+	
 	public long getExptime() {
 		return exptime;
 	}
-
+	
 	public void setExptime(long exptime) {
 		this.exptime = exptime;
 	}
-
+	
 	public int getBytes() {
 		return bytes;
 	}
-
+	
 	public void setBytes(int bytes) {
 		this.bytes = bytes;
 	}
-
-	public boolean isNoreply() {
-		return noreply;
-	}
-
-	public void setNoreply(boolean noreply) {
-		this.noreply = noreply;
-	}
-
+	
 	public byte[] getData() {
 		return data;
 	}
-
+	
 	public void setData(byte[] data) {
 		this.data = data;
 	}

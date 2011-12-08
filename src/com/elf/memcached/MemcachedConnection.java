@@ -7,16 +7,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.net.Socket;
-import java.nio.ByteBuffer;
 
-import org.apache.log4j.net.SocketAppender;
+import org.apache.log4j.Logger;
 
 import com.elf.memcached.command.Command;
+import com.elf.memcached.command.Command.CommandNames;
+import com.elf.memcached.command.RetrievalCommand;
 import com.elf.memcached.command.StorageCommand;
-import com.elf.memcached.command.StorageCommand.CommandNames;
 
 /**
  * memcach 连接对象
@@ -25,6 +23,8 @@ import com.elf.memcached.command.StorageCommand.CommandNames;
  * @since 2011-12-6 下午01:26:16
  */
 public class MemcachedConnection {
+	public static final String STORED = "STORED";
+	private Logger logger = Logger.getLogger(MemcachedConnection.class);
 	
 	/** 连接所持有的socket */
 	private Socket socket;
@@ -67,11 +67,13 @@ public class MemcachedConnection {
 	 *            待存储的key
 	 * @param value
 	 *            待存储的数据值
-	 * @return
+	 * @param exptime
+	 *            过期时间
+	 * @return 是否存储成功
 	 */
-	public boolean storage(CommandNames commandName, String key, Object value) {
-		StorageCommand cmd = new StorageCommand(commandName, key, value);
-		System.out.println(cmd.commandString());
+	public boolean storage(CommandNames commandName, String key, Object value, long exptime) {
+		StorageCommand cmd = new StorageCommand(commandName, key, value, exptime);
+		logger.debug("send a command : " + cmd.commandString());
 		byte[] c = cmd.commandString().getBytes();
 		try {
 			OutputStream os = this.socket.getOutputStream();
@@ -80,13 +82,39 @@ public class MemcachedConnection {
 			os.write(Command.RETURN.getBytes());
 			os.flush();
 			
-			//TODO 这步非常耗性能！
-			System.out.println(new BufferedReader( new InputStreamReader(this.socket.getInputStream())).readLine());
+			// TODO 这步非常耗性能！改成nio？
+//			String reply = new BufferedReader(new InputStreamReader(this.socket.getInputStream())).readLine();
+//			return reply.equals(STORED);
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	public Object get(CommandNames commandName, String key) {
+		String[] keys = new String[1];
+		keys[0] = key;
+		RetrievalCommand cmd = new RetrievalCommand(commandName, keys);
+		logger.debug("send a command : " + cmd.commandString());
+		byte[] c = cmd.commandString().getBytes();
+		OutputStream os;
+		try {
+			os = this.socket.getOutputStream();
+			os.write(c);
+			os.write(Command.RETURN.getBytes());
+			os.flush();
 			
+			BufferedReader br = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+			String l = null;
+			while((l = br.readLine()) != null){
+				System.out.println(l);
+			}
+			os.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return null;
 	}
 	
 }

@@ -1,61 +1,38 @@
 /**
- * 
+ * copyright © sf-express Inc
  */
 package com.elf.memcached;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-
-import com.elf.memcached.command.StorageCommand;
+import java.util.Map;
 
 /**
  * @author laichendong
+ * @since 2011-12-8 下午02:47:22
  */
-public class MemcachedClient {
-	/** 连接池 */
-	private MemcachedConnectionPool connectionPool;
+public abstract class MemcachedClient {
 	
-	/**
-	 * 构造方法，需要指定连接池
-	 * 
-	 * @param connectionPool
-	 *            连接池
-	 */
-	public MemcachedClient(MemcachedConnectionPool connectionPool) {
-		this.connectionPool = connectionPool;
-	}
+	public abstract boolean set(String key, Object value);
 	
-	/**
-	 * 往服务器存储数据
-	 * 
-	 * @param key
-	 *            key
-	 * @param value
-	 *            value
-	 * @return
-	 */
-	public boolean set(String key, Object value) {
-		boolean successed = false;
-		MemcachedConnection conn = connectionPool.getConnection(key);
-		successed = conn.storage(StorageCommand.CommandNames.SET, key, value);
-		connectionPool.releaseConnection(conn);
-		return successed;
-	}
+	public abstract boolean set(String key, Object value, long exptime);
 	
-	/**
-	 * @param args
-	 * @throws IOException
-	 * @throws UnknownHostException
-	 */
-	public static void main(String[] args) {
-		MemcachedConnectionPool connectionPool = new MemcachedConnectionPool(new String[]{"10.90.100.220:11211"});
-		connectionPool.initialize();
-		MemcachedClient c = new MemcachedClient(connectionPool);
-		long t = System.currentTimeMillis();
-		for(int i=0; i<100; i++){
-			c.set(i+"", i+"");
-		}
-		System.out.println(System.currentTimeMillis() - t);
-	}
+	public abstract boolean add(String key, Object value);
+	
+	public abstract boolean add(String key, Object value, long exptime);
+	
+	public abstract boolean replace(String key, Object value);
+	
+	public abstract boolean replace(String key, Object value, long exptime);
+	
+	public abstract boolean append(String key, Object value);
+	
+	public abstract boolean append(String key, Object value, long exptime);
+	
+	public abstract boolean prepend(String key, Object value);
+	
+	public abstract boolean prepend(String key, Object value, long exptime);
+	
+	public abstract Object get(String key);
+	
+	public abstract Map<String, Object> gets(String... keys);
 	
 }
