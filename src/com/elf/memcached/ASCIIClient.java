@@ -4,7 +4,6 @@
 package com.elf.memcached;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.Map;
 
 import com.elf.memcached.command.Command.CommandNames;
@@ -31,16 +30,29 @@ public class ASCIIClient extends MemcachedClient {
 	 * @throws IOException
 	 * @throws UnknownHostException
 	 */
-	public static void main(String[] args) {
-		MemcachedConnectionPool connectionPool = new MemcachedConnectionPool(new String[] { "10.90.100.220:11211" });
-		connectionPool.initialize();
-		ASCIIClient c = new ASCIIClient(connectionPool);
+	/**
+	 * @param args
+	 * @throws IOException
+	 */
+	public static void main(String[] args) throws IOException {
+//		MemcachedConnectionPool connectionPool = new MemcachedConnectionPool(new String[] { "10.90.100.220:11211" });
+//		connectionPool.initialize();
+//		
+//		ASCIIClient c = new ASCIIClient(connectionPool);
 //		long t = System.currentTimeMillis();
-//		for (int i = 0; i < 100; i++) {
-//			c.set(i + "", i + "");
-//		}
+////		for (int i = 0; i < 100; i++) {
+////			System.out.println(c.append(0+"", i + ""));
+////		}
+//		c.set("0", "3");
+//		c.prepend("0", "2");
+//		System.out.println(c.get("0"));
 //		System.out.println(System.currentTimeMillis() - t);
-		c.get("lai");
+		
+		int[][] c=new int[4][];
+		for(int i=0;i<c.length;i++){
+			System.out.println(c[i]);
+		}
+
 	}
 	
 	/**

@@ -34,14 +34,7 @@ public final class StorageCommand extends Command {
 	 *            待存储的值
 	 */
 	public StorageCommand(CommandNames commandName, String key, Object value) {
-//		new StorageCommand(commandName, key, value, 0, false);
-		this.commandName = commandName;
-		this.key = key; // TODO 使key“无害”
-		this.flags = 0;
-		this.exptime = 0;
-		this.noreply = false;
-		this.data = super.serialize(value);
-		this.bytes = this.data.length;
+		this(commandName, key, value, 0, false);
 	}
 	
 	/**
@@ -57,14 +50,7 @@ public final class StorageCommand extends Command {
 	 *            过期时间
 	 */
 	public StorageCommand(CommandNames commandName, String key, Object value, long exptime) {
-//		new StorageCommand(commandName, key, value, exptime, false);
-		this.commandName = commandName;
-		this.key = key; // TODO 使key“无害”
-		this.flags = 0;
-		this.exptime = exptime;
-		this.noreply = false;
-		this.data = super.serialize(value);
-		this.bytes = this.data.length;
+		this(commandName, key, value, exptime, false);
 	}
 	
 	/**
@@ -114,7 +100,6 @@ public final class StorageCommand extends Command {
 			cmd.append(NOREPLY);
 			cmd.append(DELIMITER);
 		}
-		cmd.append(RETURN);
 		return cmd.toString();
 	}
 	
