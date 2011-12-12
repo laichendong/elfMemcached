@@ -3,8 +3,10 @@
  */
 package com.elf.memcached;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -25,7 +27,11 @@ import com.elf.memcached.command.StorageCommand;
  */
 public class MemcachedConnection {
 	public static final String STORED = "STORED";
+<<<<<<< HEAD
 	public static final String DELETED = "DELETED";
+=======
+	public static final String END = "END";
+>>>>>>> origin/master
 	private Logger logger = Logger.getLogger(MemcachedConnection.class);
 
 	/** 连接所持有的socket */
@@ -80,14 +86,21 @@ public class MemcachedConnection {
 		try {
 			OutputStream os = this.socket.getOutputStream();
 			os.write(c);
+			os.write(Command.RETURN.getBytes());
 			os.write(cmd.getData());
 			os.write(Command.RETURN.getBytes());
 			os.flush();
 
 			// TODO 这步非常耗性能！改成nio？
+<<<<<<< HEAD
 			String reply = new BufferedReader(new InputStreamReader(this.socket.getInputStream())).readLine();
 			return reply.equals(STORED);
 			// return true;
+=======
+			InputStream is = this.socket.getInputStream();
+			String reply = new BufferedReader(new InputStreamReader(is)).readLine();
+			return reply.equals(STORED);
+>>>>>>> origin/master
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
@@ -106,13 +119,52 @@ public class MemcachedConnection {
 			os.write(c);
 			os.write(Command.RETURN.getBytes());
 			os.flush();
+<<<<<<< HEAD
 
 			BufferedReader br = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
 			String l = null;
 			while ((l = br.readLine()) != null) {
 				System.out.println(l);
+=======
+			
+			
+			BufferedInputStream bis = new BufferedInputStream(this.socket.getInputStream());
+			boolean stop = false;
+			StringBuffer sb = new StringBuffer();
+			int dataSize = 0;
+			int index = 0;
+			while (!stop) {//解析“响应头”
+				int b = bis.read();
+				if ((b == 32) || (b == 13)) {// 如果是空格或回车
+					switch (index) {
+						case 0://"VALUE" 或"END"
+							if (END.equals(sb.toString())){
+								return null;
+							}
+							break;
+						case 1://key
+							break;
+						case 2://flag
+							break;
+						case 3://dataSize
+							dataSize = Integer.parseInt(sb.toString());
+					}
+					
+					index++;
+					sb = new StringBuffer();
+					if (b == 13) {// 回车 “响应头”结束 \r
+						bis.read();// 读出最后的那个换行符 \n
+						stop = true;
+					}
+				} else {
+					sb.append((char) b);
+				}
+>>>>>>> origin/master
 			}
-			os.close();
+			//接收数据
+			byte[] data = new byte[dataSize];
+			bis.read(data);
+			return Command.deserialize(data);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

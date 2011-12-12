@@ -38,7 +38,6 @@ public class RetrievalCommand extends Command {
 			cmd.append(NOREPLY);
 			cmd.append(DELIMITER);
 		}
-		cmd.append(RETURN);
 		return cmd.toString();
 	}
 

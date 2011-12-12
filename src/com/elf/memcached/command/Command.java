@@ -58,7 +58,7 @@ public abstract class Command {
 	 *            待序列化的对象
 	 * @return 对象序列化结果
 	 */
-	public final byte[] serialize(Object obj) {
+	public static final byte[] serialize(Object obj) {
 		byte[] bytes = new byte[0];
 		try {
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -82,7 +82,7 @@ public abstract class Command {
 	 *            字节数组
 	 * @return 反序列化出来的对象
 	 */
-	public final Object deserialize(byte[] bytes) {
+	public static final Object deserialize(byte[] bytes) {
 		Object obj = new Object();
 		try {
 			ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bytes));

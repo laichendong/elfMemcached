@@ -74,16 +74,17 @@ public class MemcachedConnenctionFactory extends BasePoolableObjectFactory {
 		return conn;
 	}
 
-	/**
-	 * 销毁一个Memcached连接对象，会关闭和服务器间的socket连接
-	 * 
-	 * @see org.apache.commons.pool.BasePoolableObjectFactory#destroyObject(java.lang.Object)
-	 */
 	@Override
 	public void destroyObject(Object obj) throws Exception {
-		super.destroyObject(obj);
-		MemcachedConnection conn = (MemcachedConnection) obj;
-		conn.getSocket().close();
+		obj = null;
 	}
+
+	@Override
+	public boolean validateObject(Object obj) {
+		boolean b = super.validateObject(obj);
+		b = b && ((MemcachedConnection) obj).getSocket().isConnected();
+		return b;
+	}
+	
 
 }
