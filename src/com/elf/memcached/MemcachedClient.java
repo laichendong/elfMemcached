@@ -35,4 +35,6 @@ public abstract class MemcachedClient {
 	
 	public abstract Map<String, Object> gets(String... keys);
 	
+	public abstract boolean delete(String key);
+	
 }

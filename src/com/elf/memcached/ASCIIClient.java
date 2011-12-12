@@ -10,12 +10,14 @@ import java.util.Map;
 import com.elf.memcached.command.Command.CommandNames;
 
 /**
+ * ASCII 协议的客户端
+ * 
  * @author laichendong
  */
 public class ASCIIClient extends MemcachedClient {
 	/** 连接池 */
 	private MemcachedConnectionPool connectionPool;
-	
+
 	/**
 	 * 构造方法，需要指定连接池
 	 * 
@@ -25,7 +27,7 @@ public class ASCIIClient extends MemcachedClient {
 	public ASCIIClient(MemcachedConnectionPool connectionPool) {
 		this.connectionPool = connectionPool;
 	}
-	
+
 	/**
 	 * @param args
 	 * @throws IOException
@@ -35,14 +37,14 @@ public class ASCIIClient extends MemcachedClient {
 		MemcachedConnectionPool connectionPool = new MemcachedConnectionPool(new String[] { "10.90.100.220:11211" });
 		connectionPool.initialize();
 		ASCIIClient c = new ASCIIClient(connectionPool);
-//		long t = System.currentTimeMillis();
-//		for (int i = 0; i < 100; i++) {
-//			c.set(i + "", i + "");
-//		}
-//		System.out.println(System.currentTimeMillis() - t);
+		// long t = System.currentTimeMillis();
+		// for (int i = 0; i < 100; i++) {
+		// c.set(i + "", i + "");
+		// }
+		// System.out.println(System.currentTimeMillis() - t);
 		c.get("lai");
 	}
-	
+
 	/**
 	 * 向服务器存储数据
 	 * 
@@ -63,53 +65,52 @@ public class ASCIIClient extends MemcachedClient {
 		connectionPool.releaseConnection(conn);
 		return successed;
 	}
-	
-	
+
 	@Override
 	public boolean set(String key, Object value) {
 		return this.set(key, value, 0L);
 	}
-	
+
 	@Override
 	public boolean set(String key, Object value, long exptime) {
 		return this.storage(CommandNames.SET, key, value, exptime);
 	}
-	
+
 	@Override
 	public boolean add(String key, Object value) {
 		return this.add(key, value, 0L);
 	}
-	
+
 	@Override
 	public boolean add(String key, Object value, long exptime) {
 		return this.storage(CommandNames.ADD, key, value, exptime);
 	}
-	
+
 	@Override
 	public boolean replace(String key, Object value) {
 		return this.replace(key, value, 0L);
 	}
-	
+
 	@Override
 	public boolean replace(String key, Object value, long exptime) {
 		return this.storage(CommandNames.REPLACE, key, value, exptime);
 	}
-	
+
 	@Override
 	public boolean append(String key, Object value) {
 		return this.append(key, value, 0L);
 	}
-	
+
 	@Override
 	public boolean append(String key, Object value, long exptime) {
 		return this.storage(CommandNames.APPEND, key, value, exptime);
 	}
-	
+
 	@Override
 	public boolean prepend(String key, Object value) {
 		return this.prepend(key, value, 0L);
 	}
-	
+
 	@Override
 	public boolean prepend(String key, Object value, long exptime) {
 		return this.storage(CommandNames.PREPEND, key, value, exptime);
@@ -128,5 +129,14 @@ public class ASCIIClient extends MemcachedClient {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
+	@Override
+	public boolean delete(String key) {
+		boolean result =false;
+		MemcachedConnection conn = connectionPool.getConnection(key);
+		result = conn.delete(key);
+		connectionPool.releaseConnection(conn);
+		return result;
+	}
+
 }

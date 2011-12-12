@@ -4,7 +4,7 @@
 package com.elf.memcached.command;
 
 /**
- * 存储命令
+ * 存储类命令
  * 
  * @author laichendong
  * @since 2011-12-6 下午05:58:28
