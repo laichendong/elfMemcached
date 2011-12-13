@@ -35,7 +35,7 @@ public final class DeletionCommand extends Command {
 	public DeletionCommand(String key, boolean noreply) {
 		this.commandName = Command.CommandNames.DELETE;
 		this.key = key;
-		this.noreply = true;
+		this.noreply = noreply;
 	}
 
 	/*
@@ -46,7 +46,7 @@ public final class DeletionCommand extends Command {
 	@Override
 	public String commandString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(this.commandName);
+		sb.append(this.commandName.name);
 		sb.append(Command.DELIMITER);
 		sb.append(this.key);
 		sb.append(Command.DELIMITER);

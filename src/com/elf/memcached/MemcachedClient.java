@@ -37,4 +37,12 @@ public abstract class MemcachedClient {
 	
 	public abstract boolean delete(String key);
 	
+	public abstract long incr(String key);
+	
+	public abstract long incr(String key, long value);
+	
+	public abstract long decr(String key);
+	
+	public abstract long decr(String key, long value);
+	
 }

@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import com.elf.memcached.command.Command;
 import com.elf.memcached.command.Command.CommandNames;
 import com.elf.memcached.command.DeletionCommand;
+import com.elf.memcached.command.IncrDecrCommand;
 import com.elf.memcached.command.RetrievalCommand;
 import com.elf.memcached.command.StorageCommand;
 
@@ -177,6 +178,29 @@ public class MemcachedConnection {
 			e.printStackTrace();
 		}
 		return false;
+	}
+
+	public long incrDecr(CommandNames commandName, String key, long value) {
+		IncrDecrCommand cmd = new IncrDecrCommand(commandName, key, value);
+		logger.debug("sand a command : " + cmd.commandString());
+		byte[] c = cmd.commandString().getBytes();
+		OutputStream os;
+		try {
+			os = this.socket.getOutputStream();
+			os.write(c);
+			os.write(Command.RETURN.getBytes());
+			os.flush();
+
+			String reply = new BufferedReader(new InputStreamReader(this.socket.getInputStream())).readLine();
+			if("CLIENT_ERROR cannot increment or decrement non-numeric value".endsWith(reply)){
+				logger.error("cannot increment or decrement non-numeric value");
+				throw new IllegalStateException("cannot increment or decrement non-numeric value");
+			}
+			System.out.println(reply);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return 0;
 	}
 
 }
