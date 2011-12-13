@@ -32,22 +32,6 @@ public class ASCIIClient extends MemcachedClient {
 	 * @throws IOException
 	 * @throws UnknownHostException
 	 */
-<<<<<<< HEAD
-	public static void main(String[] args) {
-		MemcachedConnectionPool connectionPool = new MemcachedConnectionPool(new String[] { "10.90.100.220:11211" });
-		connectionPool.initialize();
-		ASCIIClient c = new ASCIIClient(connectionPool);
-		// long t = System.currentTimeMillis();
-		// for (int i = 0; i < 100; i++) {
-		// c.set(i + "", i + "");
-		// }
-		// System.out.println(System.currentTimeMillis() - t);
-		c.get("lai");
-=======
-	/**
-	 * @param args
-	 * @throws IOException
-	 */
 	public static void main(String[] args) throws IOException {
 //		MemcachedConnectionPool connectionPool = new MemcachedConnectionPool(new String[] { "10.90.100.220:11211" });
 //		connectionPool.initialize();
@@ -67,7 +51,6 @@ public class ASCIIClient extends MemcachedClient {
 			System.out.println(c[i]);
 		}
 
->>>>>>> origin/master
 	}
 
 	/**

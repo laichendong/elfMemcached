@@ -27,11 +27,8 @@ import com.elf.memcached.command.StorageCommand;
  */
 public class MemcachedConnection {
 	public static final String STORED = "STORED";
-<<<<<<< HEAD
 	public static final String DELETED = "DELETED";
-=======
 	public static final String END = "END";
->>>>>>> origin/master
 	private Logger logger = Logger.getLogger(MemcachedConnection.class);
 
 	/** 连接所持有的socket */
@@ -92,15 +89,9 @@ public class MemcachedConnection {
 			os.flush();
 
 			// TODO 这步非常耗性能！改成nio？
-<<<<<<< HEAD
-			String reply = new BufferedReader(new InputStreamReader(this.socket.getInputStream())).readLine();
-			return reply.equals(STORED);
-			// return true;
-=======
 			InputStream is = this.socket.getInputStream();
 			String reply = new BufferedReader(new InputStreamReader(is)).readLine();
 			return reply.equals(STORED);
->>>>>>> origin/master
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
@@ -119,15 +110,7 @@ public class MemcachedConnection {
 			os.write(c);
 			os.write(Command.RETURN.getBytes());
 			os.flush();
-<<<<<<< HEAD
 
-			BufferedReader br = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
-			String l = null;
-			while ((l = br.readLine()) != null) {
-				System.out.println(l);
-=======
-			
-			
 			BufferedInputStream bis = new BufferedInputStream(this.socket.getInputStream());
 			boolean stop = false;
 			StringBuffer sb = new StringBuffer();
@@ -159,7 +142,6 @@ public class MemcachedConnection {
 				} else {
 					sb.append((char) b);
 				}
->>>>>>> origin/master
 			}
 			//接收数据
 			byte[] data = new byte[dataSize];
