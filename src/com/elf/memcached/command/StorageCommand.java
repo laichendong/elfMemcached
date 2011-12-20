@@ -80,7 +80,7 @@ public final class StorageCommand extends Command {
 		this.flag = Coder.mark(value);
 		this.exptime = exptime;
 		this.noreply = noreply;
-		this.data = super.serialize(value);
+		this.data = Coder.encode(value, flag);
 		this.bytes = this.data.length;
 	}
 	
@@ -107,50 +107,9 @@ public final class StorageCommand extends Command {
 		}
 		return cmd.toString();
 	}
-	
-	
-	public String getKey() {
-		return key;
-	}
-	
-	public void setKey(String key) {
-		this.key = key;
-	}
-	
-	public int getFlag() {
-		return flag;
-	}
-	
-	public void setFlag(int flags) {
-		this.flag = flags;
-	}
-	
-	public long getExptime() {
-		return exptime;
-	}
-	
-	public void setExptime(long exptime) {
-		this.exptime = exptime;
-	}
-	
-	public int getBytes() {
-		return bytes;
-	}
-	
-	public void setBytes(int bytes) {
-		this.bytes = bytes;
-	}
-	
+
 	public byte[] getData() {
 		return data;
 	}
-	
-	public void setData(byte[] data) {
-		this.data = data;
-	}
 
-	public void setFlags(int flags) {
-		this.flag = flags;
-	}
-	
 }

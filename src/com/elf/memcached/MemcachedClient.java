@@ -45,4 +45,10 @@ public abstract class MemcachedClient {
 	
 	public abstract long decr(String key, long value);
 	
+	public abstract boolean touch(String key, long exptime);
+	
+	public abstract void flushAll();
+	
+	public abstract void flushAll(String... serverProfiles);
+	
 }

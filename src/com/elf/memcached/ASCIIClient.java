@@ -4,7 +4,12 @@
 package com.elf.memcached;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentMap;
+
+import org.apache.commons.pool.impl.GenericObjectPool;
 
 import com.elf.memcached.command.Command;
 import com.elf.memcached.command.Command.CommandNames;
@@ -33,10 +38,6 @@ public class ASCIIClient extends MemcachedClient {
 	 * @throws IOException
 	 * @throws UnknownHostException
 	 */
-	/**
-	 * @param args
-	 * @throws IOException
-	 */
 	public static void main(String[] args) throws IOException {
 		MemcachedConnectionPool connectionPool = new MemcachedConnectionPool(new String[] { "10.90.100.220:11211" });
 		connectionPool.initialize();
@@ -46,12 +47,10 @@ public class ASCIIClient extends MemcachedClient {
 		// for (int i = 0; i < 100; i++) {
 		// System.out.println(c.append(0+"", i + ""));
 		// }
-		c.set("k", 36.2f);
-		c.decr("k", 2);
-		// c.prepend("0", "2");
-		// System.out.println(c.get("k"));
-		// c.delete("0");
-		// System.out.println(c.get("0"));
+		// c.set("k", "36", 10);
+		// c.decr("k", 2);
+		// c.touch("k", 1000);
+		System.out.println(c.get("k"));
 		System.out.println(System.currentTimeMillis() - t);
 		
 	}
@@ -137,7 +136,7 @@ public class ASCIIClient extends MemcachedClient {
 	
 	@Override
 	public Map<String, Object> gets(String... keys) {
-		// TODO Auto-generated method stub
+		// TODO 待实现
 		return null;
 	}
 	
@@ -176,6 +175,44 @@ public class ASCIIClient extends MemcachedClient {
 		result = conn.incrDecr(commandName, key, value);
 		connectionPool.releaseConnection(conn);
 		return result;
+	}
+	
+	@Override
+	public boolean touch(String key, long exptime) {
+		boolean result = false;
+		MemcachedConnection conn = connectionPool.getConnection(key);
+		result = conn.touch(key, exptime);
+		connectionPool.releaseConnection(conn);
+		return result;
+	}
+	
+	@Override
+	public void flushAll() {
+		ConcurrentMap<String, GenericObjectPool> pools = connectionPool.getPools();
+		for (Entry<String, GenericObjectPool> entry : pools.entrySet()) {
+			try {
+				MemcachedConnection conn = (MemcachedConnection) entry.getValue().borrowObject();
+				conn.flushAll();
+			} catch (Exception e) {
+			}
+		}
+		
+	}
+	
+	@Override
+	public void flushAll(String... serverProfiles) {
+		ConcurrentMap<String, GenericObjectPool> pools = connectionPool.getPools();
+		for (Entry<String, GenericObjectPool> entry : pools.entrySet()) {
+			try {
+				for (String server : serverProfiles) {
+					if (server.equals(entry.getKey())) {
+						MemcachedConnection conn = (MemcachedConnection) entry.getValue().borrowObject();
+						conn.flushAll();
+					}
+				}
+			} catch (Exception e) {
+			}
+		}
 	}
 	
 }

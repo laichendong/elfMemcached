@@ -220,5 +220,9 @@ public class MemcachedConnectionPool {
 		System.out.println(a + "==" + idle);
 		System.out.println(System.currentTimeMillis() - t);
 	}
+
+	public ConcurrentMap<String, GenericObjectPool> getPools() {
+		return pools;
+	}
 	
 }

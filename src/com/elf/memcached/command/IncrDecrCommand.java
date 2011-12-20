@@ -9,7 +9,7 @@ package com.elf.memcached.command;
  * @author laichendong
  * @since 2011-12-13 上午10:42:47
  */
-public class IncrDecrCommand extends Command {
+public final class IncrDecrCommand extends Command {
 	
 	/** key */
 	private String key;

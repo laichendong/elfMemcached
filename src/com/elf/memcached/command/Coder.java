@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidParameterException;
 import java.util.Date;
 
 /**
@@ -74,47 +75,47 @@ public final class Coder {
 		return flag;
 	}
 	
-	public static final byte[] encode(byte[] s) {
+	private static final byte[] encode(byte[] s) {
 		return s;
 	}
 	
-	public static final byte[] encode(Boolean s) {
+	private static final byte[] encode(Boolean s) {
 		return encode(s ? "1" : "0");
 	}
 	
-	public static final byte[] encode(Byte s) {
+	private static final byte[] encode(Byte s) {
 		return new byte[] { s };
 	}
 	
-	public static final byte[] encode(Character s) {
+	private static final byte[] encode(Character s) {
 		return encode(s + "");
 	}
 	
-	public static final byte[] encode(Short s) {
+	private static final byte[] encode(Short s) {
 		return encode(s + "");
 	}
 	
-	public static final byte[] encode(Integer s) {
+	private static final byte[] encode(Integer s) {
 		return encode(s + "");
 	}
 	
-	public static final byte[] encode(Long s) {
+	private static final byte[] encode(Long s) {
 		return encode(s + "");
 	}
 	
-	public static final byte[] encode(Float s) {
+	private static final byte[] encode(Float s) {
 		return encode(s + "");
 	}
 	
-	public static final byte[] encode(Double s) {
+	private static final byte[] encode(Double s) {
 		return encode(s + "");
 	}
 	
-	public static final byte[] encode(Date s) {
+	private static final byte[] encode(Date s) {
 		return encode(s.getTime() + "");
 	}
 	
-	public static final byte[] encode(String s) {
+	private static final byte[] encode(String s) {
 		byte[] bytes = new byte[0];
 		try {
 			bytes = s.getBytes("utf-8");
@@ -124,11 +125,11 @@ public final class Coder {
 		return bytes;
 	}
 	
-	public static final byte[] encode(StringBuffer s) {
+	private static final byte[] encode(StringBuffer s) {
 		return encode(s.toString() + "");
 	}
 	
-	public static final byte[] encode(StringBuilder s) {
+	private static final byte[] encode(StringBuilder s) {
 		return encode(s.toString() + "");
 	}
 	
@@ -156,7 +157,7 @@ public final class Coder {
 	 *            待序列化的对象
 	 * @return 序列化结果
 	 */
-	public static final byte[] encode(Object obj) {
+	private static final byte[] encode(Object obj) {
 		byte[] bytes = new byte[0];
 		try {
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -180,7 +181,7 @@ public final class Coder {
 	 *            字节数组
 	 * @return 反序列化出来的对象
 	 */
-	public static final Object decode(byte[] bytes) {
+	private static final Object decode(byte[] bytes) {
 		Object obj = new Object();
 		try {
 			ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bytes));
@@ -192,6 +193,9 @@ public final class Coder {
 	}
 	
 	public static final Object decode(byte[] bytes, int flag) {
+		if(flag < 0){
+			throw new InvalidParameterException("flag 标志位必须不小于零");
+		}
 		Object obj = null;
 		switch (flag) {
 			case BYTE_ARRY:{
@@ -252,5 +256,71 @@ public final class Coder {
 			}
 		}
 		return obj;
+	}
+
+	public static byte[] encode(Object value, int flag) {
+		if(flag < 0){
+			throw new InvalidParameterException("flag 标志位必须不小于零");
+		}
+		byte[] bytes = new byte[0];
+		switch (flag) {
+			case BYTE_ARRY:{
+				bytes = encode((byte[]) value);
+				break;
+			}
+			case BOOLEAN: {
+				bytes = encode((Boolean) value);
+				break;
+			}
+			case BYTE: {
+				bytes = encode((Byte) value);
+				break;
+			}
+			case SHORT:{
+				bytes = encode((Short) value);
+				break;
+			}
+			case CHAR:{
+				bytes = encode((Character) value);
+				break;
+			}
+			case INT:{
+				bytes = encode((Integer) value);
+				break;
+			}
+			case LONG:{
+				bytes = encode((Long) value);
+				break;
+			}
+			case FLOAT:{
+				bytes = encode((Float) value);
+				break;
+			}
+			case DOUBLE:{
+				bytes = encode((Double) value);
+				break;
+			}
+			case DATE:{
+				bytes = encode((Date) value);
+				break;
+			}
+			case STRING:{
+				bytes = encode((String) value);
+				break;
+			}
+			case STRING_BUFFER:{
+				bytes = encode((StringBuffer) value);
+				break;
+			}
+			case STRING_BUILDER:{
+				bytes = encode((StringBuilder) value);
+				break;
+			}
+			case OBJ_BIN:{
+				bytes = encode(value);
+				break;
+			}
+		}
+		return bytes;
 	}
 }

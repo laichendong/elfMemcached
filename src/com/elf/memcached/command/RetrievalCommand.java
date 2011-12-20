@@ -10,7 +10,7 @@ package com.elf.memcached.command;
  * @author laichendong
  * @since 2011-12-8 下午03:44:52
  */
-public class RetrievalCommand extends Command {
+public final class RetrievalCommand extends Command {
 
 	/** 待获取数据的keys */
 	private String[] keys;
