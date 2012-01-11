@@ -32,6 +32,12 @@ public interface MemcachedClient {
 	 */
 	public abstract boolean set(String key, Object value, long exptime);
 	
+	/**
+	 * 
+	 * @param key
+	 * @param value
+	 * @return
+	 */
 	public abstract boolean add(String key, Object value);
 	
 	public abstract boolean add(String key, Object value, long exptime);
