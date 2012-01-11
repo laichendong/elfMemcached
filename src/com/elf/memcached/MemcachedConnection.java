@@ -43,8 +43,7 @@ public class MemcachedConnection {
 	/**
 	 * 构造方法 需要指定持有的socket对象
 	 * 
-	 * @param socket
-	 *            持有的socket对象
+	 * @param socket 持有的socket对象
 	 */
 	public MemcachedConnection(Socket socket, String hostProfile) {
 		this.socket = socket;
@@ -105,10 +104,8 @@ public class MemcachedConnection {
 	/**
 	 * 获取指定key上的
 	 * 
-	 * @param commandName
-	 *            命令名称
-	 * @param key
-	 *            key
+	 * @param commandName 命令名称
+	 * @param key key
 	 * @return 获取到的数据，如果没有获取到，返回null
 	 */
 	public Object get(CommandNames commandName, String key) {
@@ -171,8 +168,7 @@ public class MemcachedConnection {
 	/**
 	 * 从服务器删除有key指定的键值
 	 * 
-	 * @param key
-	 *            待删除的key
+	 * @param key 待删除的key
 	 * @return 是否删除成功
 	 */
 	public boolean delete(String key) {
@@ -197,12 +193,9 @@ public class MemcachedConnection {
 	/**
 	 * 递增或递减 key上的数据
 	 * 
-	 * @param commandName
-	 *            命令名称
-	 * @param key
-	 *            key
-	 * @param value
-	 *            递增或递减的量
+	 * @param commandName 命令名称
+	 * @param key key
+	 * @param value 递增或递减的量
 	 * @return key上改变后的值
 	 */
 	public long incrDecr(CommandNames commandName, String key, long value) {

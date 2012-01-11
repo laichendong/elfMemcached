@@ -28,13 +28,10 @@ public final class StorageCommand extends Command {
 	/**
 	 * 构造方法
 	 * 
-	 * @param commandName
-	 *            命令名称
-	 * @param key
-	 *            待存储的key
-	 * @param value
-	 *            待存储的值
-	 * @throws IOException 
+	 * @param commandName 命令名称
+	 * @param key 待存储的key
+	 * @param value 待存储的值
+	 * @throws IOException
 	 */
 	public StorageCommand(CommandNames commandName, String key, Object value) {
 		this(commandName, key, value, 0, false);
@@ -43,15 +40,11 @@ public final class StorageCommand extends Command {
 	/**
 	 * 构造方法
 	 * 
-	 * @param commandName
-	 *            命令名称
-	 * @param key
-	 *            待存储的key
-	 * @param value
-	 *            待存储的value
-	 * @param exptime
-	 *            过期时间
-	 * @throws IOException 
+	 * @param commandName 命令名称
+	 * @param key 待存储的key
+	 * @param value 待存储的value
+	 * @param exptime 过期时间
+	 * @throws IOException
 	 */
 	public StorageCommand(CommandNames commandName, String key, Object value, long exptime) {
 		this(commandName, key, value, exptime, false);
@@ -60,17 +53,12 @@ public final class StorageCommand extends Command {
 	/**
 	 * 构造方法
 	 * 
-	 * @param commandName
-	 *            命令名称
-	 * @param key
-	 *            待存储的key
-	 * @param value
-	 *            待存储的value
-	 * @param exptime
-	 *            过期时间
-	 * @param noreply
-	 *            是否不需要答复
-	 * @throws IOException 
+	 * @param commandName 命令名称
+	 * @param key 待存储的key
+	 * @param value 待存储的value
+	 * @param exptime 过期时间
+	 * @param noreply 是否不需要答复
+	 * @throws IOException
 	 */
 	public StorageCommand(CommandNames commandName, String key, Object value, long exptime, boolean noreply) {
 		// TODO 参数合法性检查
@@ -107,9 +95,9 @@ public final class StorageCommand extends Command {
 		}
 		return cmd.toString();
 	}
-
+	
 	public byte[] getData() {
 		return data;
 	}
-
+	
 }

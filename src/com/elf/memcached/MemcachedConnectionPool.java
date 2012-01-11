@@ -62,8 +62,7 @@ public class MemcachedConnectionPool {
 	/**
 	 * 指定服务器列表的构造方法
 	 * 
-	 * @param servers
-	 *            服务器列表
+	 * @param servers 服务器列表
 	 */
 	public MemcachedConnectionPool(String servers[]) {
 		this.servers = servers;
@@ -81,7 +80,8 @@ public class MemcachedConnectionPool {
 			this.pools = new ConcurrentHashMap<String, GenericObjectPool>();
 			GenericObjectPool.Config conf = makeConfig();
 			for (String hostProfile : this.servers) {
-				GenericObjectPool poolOnOneServer = new GenericObjectPool(new MemcachedConnenctionFactory(hostProfile),conf);
+				GenericObjectPool poolOnOneServer = new GenericObjectPool(new MemcachedConnenctionFactory(hostProfile),
+						conf);
 				pools.putIfAbsent(hostProfile, poolOnOneServer);
 			}
 			initialized = true;
@@ -99,18 +99,18 @@ public class MemcachedConnectionPool {
 	 */
 	private Config makeConfig() {
 		Config conf = new Config();
-		conf.lifo = true;//后进先出
-		conf.maxActive = this.maxActive; //最大激活数（池容量）
-		conf.maxIdle = this.maxIdle; //最大空闲连接数
-		conf.maxWait = this.maxWait; //从池里取出连接时最大的等待时间
-		conf.minEvictableIdleTimeMillis = 60*1000; // 超过一分钟空闲的连接才能被清理
+		conf.lifo = true;// 后进先出
+		conf.maxActive = this.maxActive; // 最大激活数（池容量）
+		conf.maxIdle = this.maxIdle; // 最大空闲连接数
+		conf.maxWait = this.maxWait; // 从池里取出连接时最大的等待时间
+		conf.minEvictableIdleTimeMillis = 60 * 1000; // 超过一分钟空闲的连接才能被清理
 		conf.minIdle = this.minIdle; // 最小空闲连接
 		conf.numTestsPerEvictionRun = -8;// 后台清理时每次检查当前连接数的1/8的连接。
-		conf.softMinEvictableIdleTimeMillis = GenericObjectPool.DEFAULT_SOFT_MIN_EVICTABLE_IDLE_TIME_MILLIS;//？
+		conf.softMinEvictableIdleTimeMillis = GenericObjectPool.DEFAULT_SOFT_MIN_EVICTABLE_IDLE_TIME_MILLIS;// ？
 		conf.testOnBorrow = true; // 从池中取出连接时检查连接的有效性
 		conf.testOnReturn = true; // 把连接放回池中时检查连接的有效性
 		conf.testWhileIdle = false; // 后台清理连接时。不对没过期的连接进行有效性检查
-		conf.timeBetweenEvictionRunsMillis = 5*60*1000; // 每5分钟进行一次后台连接清理
+		conf.timeBetweenEvictionRunsMillis = 5 * 60 * 1000; // 每5分钟进行一次后台连接清理
 		conf.whenExhaustedAction = GenericObjectPool.WHEN_EXHAUSTED_BLOCK; // 当从池中取出连接且空闲连接用完时，等待下一个空闲连接（有人还回来）
 		return conf;
 	}
@@ -118,8 +118,7 @@ public class MemcachedConnectionPool {
 	/**
 	 * 获取一个可用的socket连接
 	 * 
-	 * @param key
-	 *            获取连接的key
+	 * @param key 获取连接的key
 	 * @return 到对应服务器的socket连接
 	 */
 	public MemcachedConnection getConnection(String key) {
@@ -159,8 +158,7 @@ public class MemcachedConnectionPool {
 	/**
 	 * 基于MD5的hash算法
 	 * 
-	 * @param key
-	 *            待hash的key
+	 * @param key 待hash的key
 	 * @return hash值
 	 */
 	private long md5HashingAlg(String key) {
@@ -184,8 +182,7 @@ public class MemcachedConnectionPool {
 	/**
 	 * 客户端用完连接后，调用该方法还回连接池
 	 * 
-	 * @param conn
-	 *            待释放的连接
+	 * @param conn 待释放的连接
 	 */
 	public void releaseConnection(MemcachedConnection conn) {
 		String hostProfile = conn.getHostProfile();
@@ -198,29 +195,29 @@ public class MemcachedConnectionPool {
 		}
 	}
 	
-	public static void main(String[] asd) throws IOException{
+	public static void main(String[] asd) throws IOException {
 		MemcachedConnectionPool connectionPool = new MemcachedConnectionPool(new String[] { "10.90.100.220:11211" });
 		connectionPool.initialize();
 		long t = System.currentTimeMillis();
-		for(int i=0; i<32; i++){
+		for (int i = 0; i < 32; i++) {
 			MemcachedConnection conn = connectionPool.getConnection("lai");
-			if(conn.getSocket().isConnected()){
+			if (conn.getSocket().isConnected()) {
 				conn.getSocket().getOutputStream().write("set key 0 0 1\r\n1\r\n".getBytes());
 				conn.getSocket().getOutputStream().flush();
 				String s = new BufferedReader(new InputStreamReader(conn.getSocket().getInputStream())).readLine();
-				System.out.println(i+s);
+				System.out.println(i + s);
 			}
 			connectionPool.releaseConnection(conn);
 		}
-//		for(int j=0; j<connectionPool.maxActive; j++){
-//			connectionPool.getConnection("lai");
-//		}
+		// for(int j=0; j<connectionPool.maxActive; j++){
+		// connectionPool.getConnection("lai");
+		// }
 		int a = connectionPool.pools.get("10.90.100.220:11211").getNumActive();
 		int idle = connectionPool.pools.get("10.90.100.220:11211").getNumIdle();
 		System.out.println(a + "==" + idle);
 		System.out.println(System.currentTimeMillis() - t);
 	}
-
+	
 	public ConcurrentMap<String, GenericObjectPool> getPools() {
 		return pools;
 	}

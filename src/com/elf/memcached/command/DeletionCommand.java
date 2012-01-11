@@ -10,37 +10,33 @@ package com.elf.memcached.command;
  * @since 2011-12-10
  */
 public final class DeletionCommand extends Command {
-
+	
 	/** 待删除的key */
 	private String key;
-
+	
 	/**
 	 * 构造方法
 	 * 
-	 * @param key
-	 *            待删除的key
+	 * @param key 待删除的key
 	 */
 	public DeletionCommand(String key) {
 		this(key, false);
 	}
-
+	
 	/**
 	 * 构造方法
 	 * 
-	 * @param key
-	 *            待删除的key
-	 * @param noreply
-	 *            指定是否需要服务端应答
+	 * @param key 待删除的key
+	 * @param noreply 指定是否需要服务端应答
 	 */
 	public DeletionCommand(String key, boolean noreply) {
 		this.commandName = Command.CommandNames.DELETE;
 		this.key = key;
 		this.noreply = noreply;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see com.elf.memcached.command.Command#commandString()
 	 */
 	@Override
@@ -56,5 +52,5 @@ public final class DeletionCommand extends Command {
 		}
 		return sb.toString();
 	}
-
+	
 }

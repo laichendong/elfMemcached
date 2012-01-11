@@ -134,12 +134,12 @@ public final class Coder {
 	}
 	
 	public static void main(String[] s) {
-		System.out.println(decode(encode(new byte[]{53}), BYTE_ARRY));
+		System.out.println(decode(encode(new byte[] { 53 }), BYTE_ARRY));
 		System.out.println(decode(encode(true), BOOLEAN));
 		System.out.println(decode(encode(Byte.valueOf("53")), BYTE));
 		System.out.println(decode(encode('a'), CHAR));
 		System.out.println(decode(encode(4), INT));
-		System.out.println(decode(encode((short)4), SHORT));
+		System.out.println(decode(encode((short) 4), SHORT));
 		System.out.println(decode(encode(4L), LONG));
 		System.out.println(decode(encode(4.2F), FLOAT));
 		System.out.println(decode(encode(43.1D), DOUBLE));
@@ -153,8 +153,7 @@ public final class Coder {
 	/**
 	 * 使用默认的java序列化机制序列化
 	 * 
-	 * @param obj
-	 *            待序列化的对象
+	 * @param obj 待序列化的对象
 	 * @return 序列化结果
 	 */
 	private static final byte[] encode(Object obj) {
@@ -177,8 +176,7 @@ public final class Coder {
 	/**
 	 * 使用java默认的反序列化机制反序列化
 	 * 
-	 * @param bytes
-	 *            字节数组
+	 * @param bytes 字节数组
 	 * @return 反序列化出来的对象
 	 */
 	private static final Object decode(byte[] bytes) {
@@ -193,12 +191,12 @@ public final class Coder {
 	}
 	
 	public static final Object decode(byte[] bytes, int flag) {
-		if(flag < 0){
+		if (flag < 0) {
 			throw new InvalidParameterException("flag 标志位必须不小于零");
 		}
 		Object obj = null;
 		switch (flag) {
-			case BYTE_ARRY:{
+			case BYTE_ARRY: {
 				obj = bytes;
 				break;
 			}
@@ -210,61 +208,61 @@ public final class Coder {
 				obj = bytes[0];
 				break;
 			}
-			case SHORT:{
+			case SHORT: {
 				obj = Short.valueOf(new String(bytes));
 				break;
 			}
-			case CHAR:{
-				obj = Character.valueOf((char)bytes[0]);
+			case CHAR: {
+				obj = Character.valueOf((char) bytes[0]);
 				break;
 			}
-			case INT:{
+			case INT: {
 				obj = Integer.valueOf(new String(bytes));
 				break;
 			}
-			case LONG:{
+			case LONG: {
 				obj = Long.valueOf(new String(bytes));
 				break;
 			}
-			case FLOAT:{
+			case FLOAT: {
 				obj = Float.valueOf(new String(bytes));
 				break;
 			}
-			case DOUBLE:{
+			case DOUBLE: {
 				obj = Double.valueOf(new String(bytes));
 				break;
 			}
-			case DATE:{
+			case DATE: {
 				obj = new Date(Long.valueOf(new String(bytes)));
 				break;
 			}
-			case STRING:{
+			case STRING: {
 				obj = new String(bytes);
 				break;
 			}
-			case STRING_BUFFER:{
+			case STRING_BUFFER: {
 				obj = new StringBuffer(new String(bytes));
 				break;
 			}
-			case STRING_BUILDER:{
+			case STRING_BUILDER: {
 				obj = new StringBuilder(new String(bytes));
 				break;
 			}
-			case OBJ_BIN:{
+			case OBJ_BIN: {
 				obj = decode(bytes);
 				break;
 			}
 		}
 		return obj;
 	}
-
+	
 	public static byte[] encode(Object value, int flag) {
-		if(flag < 0){
+		if (flag < 0) {
 			throw new InvalidParameterException("flag 标志位必须不小于零");
 		}
 		byte[] bytes = new byte[0];
 		switch (flag) {
-			case BYTE_ARRY:{
+			case BYTE_ARRY: {
 				bytes = encode((byte[]) value);
 				break;
 			}
@@ -276,47 +274,47 @@ public final class Coder {
 				bytes = encode((Byte) value);
 				break;
 			}
-			case SHORT:{
+			case SHORT: {
 				bytes = encode((Short) value);
 				break;
 			}
-			case CHAR:{
+			case CHAR: {
 				bytes = encode((Character) value);
 				break;
 			}
-			case INT:{
+			case INT: {
 				bytes = encode((Integer) value);
 				break;
 			}
-			case LONG:{
+			case LONG: {
 				bytes = encode((Long) value);
 				break;
 			}
-			case FLOAT:{
+			case FLOAT: {
 				bytes = encode((Float) value);
 				break;
 			}
-			case DOUBLE:{
+			case DOUBLE: {
 				bytes = encode((Double) value);
 				break;
 			}
-			case DATE:{
+			case DATE: {
 				bytes = encode((Date) value);
 				break;
 			}
-			case STRING:{
+			case STRING: {
 				bytes = encode((String) value);
 				break;
 			}
-			case STRING_BUFFER:{
+			case STRING_BUFFER: {
 				bytes = encode((StringBuffer) value);
 				break;
 			}
-			case STRING_BUILDER:{
+			case STRING_BUILDER: {
 				bytes = encode((StringBuilder) value);
 				break;
 			}
-			case OBJ_BIN:{
+			case OBJ_BIN: {
 				bytes = encode(value);
 				break;
 			}

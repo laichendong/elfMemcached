@@ -28,12 +28,11 @@ public class MemcachedConnenctionFactory extends BasePoolableObjectFactory {
 	private Logger logger = Logger.getLogger(MemcachedConnenctionFactory.class);
 	/** 服务器特征字符串，标识与之对应的服务器上的socket连接池 */
 	private String hostProfile;
-
+	
 	/**
 	 * 构造方法
 	 * 
-	 * @param hostProfile
-	 *            服务器特征字符串， 主机名:端口或只有主机名
+	 * @param hostProfile 服务器特征字符串， 主机名:端口或只有主机名
 	 */
 	public MemcachedConnenctionFactory(String hostProfile) {
 		if (hostProfile == null || hostProfile.isEmpty()) {
@@ -59,7 +58,7 @@ public class MemcachedConnenctionFactory extends BasePoolableObjectFactory {
 			throw new InvalidParameterException("以冒号开头，错误hostProfile的格式。");
 		}
 	}
-
+	
 	/**
 	 * 创建一个Memcached连接对象
 	 * 
@@ -73,12 +72,12 @@ public class MemcachedConnenctionFactory extends BasePoolableObjectFactory {
 		MemcachedConnection conn = new MemcachedConnection(socket, hostProfile);
 		return conn;
 	}
-
+	
 	@Override
 	public void destroyObject(Object obj) throws Exception {
 		obj = null;
 	}
-
+	
 	@Override
 	public boolean validateObject(Object obj) {
 		boolean b = super.validateObject(obj);
@@ -86,5 +85,4 @@ public class MemcachedConnenctionFactory extends BasePoolableObjectFactory {
 		return b;
 	}
 	
-
 }

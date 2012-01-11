@@ -9,10 +9,23 @@ import java.util.Map;
  * @author laichendong
  * @since 2011-12-8 下午02:47:22
  */
-public abstract class MemcachedClient {
+public interface MemcachedClient {
 	
+	/**
+	 * 向服务器存储一个k,v对。如果k已经存在，则会覆盖掉之前的值。{@link com.elf.memcached.MemcachedClient#set(java.lang.String, java.lang.Object, long)}
+	 * 
+	 * @param key 存储使用的key
+	 * @param value 处处的value
+	 * @return 如果存储成功，则返回true，否则返回false。
+	 */
 	public abstract boolean set(String key, Object value);
 	
+	/**
+	 * @param key
+	 * @param value
+	 * @param exptime
+	 * @return
+	 */
 	public abstract boolean set(String key, Object value, long exptime);
 	
 	public abstract boolean add(String key, Object value);
