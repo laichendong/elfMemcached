@@ -12,19 +12,23 @@ import java.util.Map;
 public interface MemcachedClient {
 	
 	/**
-	 * 向服务器存储一个k,v对。如果k已经存在，则会覆盖掉之前的值。{@link com.elf.memcached.MemcachedClient#set(java.lang.String, java.lang.Object, long)}
+	 * 向服务器存储一个k,v对（不过期，设置过期时间请用：{@link com.elf.memcached.MemcachedClient#set(java.lang.String, java.lang.Object, long)}
+	 * ）。如果k已经存在，则会覆盖掉之前的值。
 	 * 
 	 * @param key 存储使用的key
-	 * @param value 处处的value
+	 * @param value 存储的value
 	 * @return 如果存储成功，则返回true，否则返回false。
 	 */
 	public abstract boolean set(String key, Object value);
 	
 	/**
-	 * @param key
-	 * @param value
-	 * @param exptime
-	 * @return
+	 * 向服务器存储一个k,v对。如果k已经存在，则会覆盖掉之前的值。用exptime设置过期时间。
+	 * 如果设置的小于60*60*24*30（30天），表示从设置到exptime秒后过期；如果大于等于这个值，则表示exptime是一个unix时间戳。到这个时间戳表示的时间过期
+	 * 
+	 * @param key 存储使用的key
+	 * @param value 存储的value
+	 * @param exptime 过期时间，单位为秒
+	 * @return 如果存储成功，则返回true，否则返回false。
 	 */
 	public abstract boolean set(String key, Object value, long exptime);
 	
