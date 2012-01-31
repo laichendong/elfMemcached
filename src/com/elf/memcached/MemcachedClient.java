@@ -76,13 +76,13 @@ public interface MemcachedClient {
 	 */
 	public abstract boolean replace(String key, Object value, long exptime);
 	
-	public abstract boolean append(String key, Object value);
+	public abstract <T extends CharSequence> boolean append(String key, T value);
 	
-	public abstract boolean append(String key, Object value, long exptime);
+	public abstract <T extends CharSequence> boolean append(String key, T value, long exptime);
 	
-	public abstract boolean prepend(String key, Object value);
+	public abstract <T extends CharSequence> boolean prepend(String key, T value);
 	
-	public abstract boolean prepend(String key, Object value, long exptime);
+	public abstract <T extends CharSequence> boolean prepend(String key, T value, long exptime);
 	
 	public abstract Object get(String key);
 	
@@ -103,5 +103,5 @@ public interface MemcachedClient {
 	public abstract void flushAll();
 	
 	public abstract void flushAll(String... serverProfiles);
-	
+
 }

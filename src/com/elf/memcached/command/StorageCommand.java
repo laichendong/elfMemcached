@@ -65,10 +65,10 @@ public final class StorageCommand extends Command {
 		// TODO 序列化方式的选择和优化，java原生/json。 可用flags字段做标记
 		this.commandName = commandName;
 		this.key = key; // TODO 使key“无害”
-		this.flag = Coder.mark(value);
+		this.flag = EncoderDecoder.mark(value).getValue();
 		this.exptime = exptime;
 		this.noreply = noreply;
-		this.data = Coder.encode(value, flag);
+		this.data = EncoderDecoder.encode(value, Flag.fromInt(flag));
 		this.bytes = this.data.length;
 	}
 	

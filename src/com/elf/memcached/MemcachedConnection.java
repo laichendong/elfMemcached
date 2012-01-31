@@ -13,10 +13,11 @@ import java.net.Socket;
 
 import org.apache.log4j.Logger;
 
-import com.elf.memcached.command.Coder;
+import com.elf.memcached.command.EncoderDecoder;
 import com.elf.memcached.command.Command;
 import com.elf.memcached.command.Command.CommandNames;
 import com.elf.memcached.command.DeletionCommand;
+import com.elf.memcached.command.Flag;
 import com.elf.memcached.command.FlushAllCommand;
 import com.elf.memcached.command.IncrDecrCommand;
 import com.elf.memcached.command.RetrievalCommand;
@@ -80,6 +81,8 @@ public class MemcachedConnection {
 	 * @return 是否存储成功
 	 */
 	public boolean storage(CommandNames commandName, String key, Object value, long exptime) {
+		//如果命令是append或prepend，则先判断是否为字符串
+		
 		StorageCommand cmd = new StorageCommand(commandName, key, value, exptime);
 		logger.debug("send a command : " + cmd.commandString());
 		byte[] c = cmd.commandString().getBytes();
@@ -125,7 +128,7 @@ public class MemcachedConnection {
 			boolean stop = false;
 			StringBuffer sb = new StringBuffer();
 			int dataSize = 0;
-			int flag = -1;
+			Flag flag = Flag.NULL;
 			int index = 0;
 			while (!stop) {// 解析“响应头”
 				int b = bis.read();
@@ -139,7 +142,7 @@ public class MemcachedConnection {
 						case 1:// key
 							break;
 						case 2:// flag
-							flag = Integer.parseInt(sb.toString());
+							flag = Flag.fromInt(Integer.parseInt(sb.toString()));
 							break;
 						case 3:// dataSize
 							dataSize = Integer.parseInt(sb.toString());
@@ -158,7 +161,7 @@ public class MemcachedConnection {
 			// 接收数据
 			byte[] data = new byte[dataSize];
 			bis.read(data);
-			return Coder.decode(data, flag);
+			return EncoderDecoder.decode(data, flag);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

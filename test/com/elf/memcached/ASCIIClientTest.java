@@ -3,8 +3,6 @@
  */
 package com.elf.memcached;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import junit.framework.Assert;
 
 import org.junit.After;
@@ -17,7 +15,9 @@ import org.junit.Test;
  */
 public class ASCIIClientTest {
 	
-	static MemcachedClient asciiClient;
+	static MemcachedClient client;
+	/** 默认的用来测试的key */
+	private static final String K = "key";
 	
 	/**
 	 * 初始化一个有用的客户端
@@ -27,12 +27,12 @@ public class ASCIIClientTest {
 		MemcachedConnectionPool pool = new MemcachedConnectionPool(new String[] { "10.90.100.220:11211",
 				"10.90.100.220:11211", "10.90.100.220:11211" });
 		pool.initialize();
-		asciiClient = new ASCIIClient(pool);
+		client = new ASCIIClient(pool);
 	}
 	
 	@After
 	public void clean() {
-		asciiClient.delete("k");
+		client.delete(K);
 	}
 	
 	/**
@@ -41,8 +41,8 @@ public class ASCIIClientTest {
 	 */
 	@Test
 	public void test_set() {
-		Assert.assertTrue(asciiClient.set("k", "v"));
-		Assert.assertEquals("v", asciiClient.get("k"));
+		Assert.assertTrue(client.set(K, "v"));
+		Assert.assertEquals("v", client.get(K));
 	}
 	
 	/**
@@ -51,8 +51,8 @@ public class ASCIIClientTest {
 	 */
 	@Test
 	public void test_set_with_exptime() {
-		Assert.assertTrue(asciiClient.set("k", "v", 10L));
-		Assert.assertEquals("v", asciiClient.get("k"));
+		Assert.assertTrue(client.set(K, "v", 10L));
+		Assert.assertEquals("v", client.get(K));
 	}
 	
 	/**
@@ -63,10 +63,10 @@ public class ASCIIClientTest {
 	 */
 	@Test
 	public void test_set_exptime() throws InterruptedException {
-		Assert.assertTrue(asciiClient.set("k", "v", 1L));
+		Assert.assertTrue(client.set(K, "v", 1L));
 		Thread.sleep(1000);
-		System.out.println(asciiClient.get("k"));
-		Assert.assertNull(asciiClient.get("k"));
+		System.out.println(client.get(K));
+		Assert.assertNull(client.get(K));
 	}
 	
 	/**
@@ -75,8 +75,8 @@ public class ASCIIClientTest {
 	 */
 	@Test
 	public void test_add() {
-		Assert.assertTrue(asciiClient.add("k", "v"));
-		Assert.assertEquals(asciiClient.get("k"), "v");
+		Assert.assertTrue(client.add(K, "v"));
+		Assert.assertEquals(client.get(K), "v");
 	}
 	
 	/**
@@ -85,150 +85,57 @@ public class ASCIIClientTest {
 	 */
 	@Test
 	public void test_add_exist_key() {
-		Assert.assertTrue(asciiClient.add("k", "v"));
-		Assert.assertTrue(!asciiClient.add("k", "v1"));
-		Assert.assertEquals(asciiClient.get("k"), "v");
+		Assert.assertTrue(client.add(K, "v"));
+		Assert.assertTrue(!client.add(K, "v1"));
+		Assert.assertEquals(client.get(K), "v");
 	}
 	
 	/**
 	 * 测试{@link com.elf.memcached.ASCIIClient#add(java.lang.String, java.lang.Object, long)}.
-	 * 
-	 * @throws InterruptedException
+	 * 在超时后缓存自动失效
 	 */
 	@Test
 	public void test_add_with_exptime() throws InterruptedException {
-		Assert.assertTrue(asciiClient.add("k", "v", 1L));
-		Assert.assertEquals("v", asciiClient.get("k"));
+		Assert.assertTrue(client.add(K, "v", 1L));
+		Assert.assertEquals("v", client.get(K));
 		Thread.sleep(1000);
-		Assert.assertNull(asciiClient.get("k"));
+		Assert.assertNull(client.get(K));
 	}
 	
 	/**
-	 * Test method for {@link com.elf.memcached.ASCIIClient#replace(java.lang.String, java.lang.Object)}.
+	 * 测试{@link com.elf.memcached.ASCIIClient#append(String, CharSequence))}.
 	 */
 	@Test
-	public void testReplaceStringObject() {
-		fail("Not yet implemented");
+	public void test_append() {
+		// 不能直接对没有存储的key进行append
+		Assert.assertEquals(false, client.append("testAppendNotExist", "testAppendNotExist"));
+		
+		client.add(K, "v");
+		client.append(K, "_afterFix");
+		Assert.assertEquals("v_afterFix", client.get(K));
 	}
 	
 	/**
-	 * Test method for {@link com.elf.memcached.ASCIIClient#replace(java.lang.String, java.lang.Object, long)}.
+	 * 测试append到一个非字符串类的值上
 	 */
 	@Test
-	public void testReplaceStringObjectLong() {
-		fail("Not yet implemented");
+	public void test_append_to_not_string_value() {
+		client.set(K, 0);
+		client.append(K, "someThing");
+		System.out.println("===" + client.get(K));
 	}
 	
 	/**
-	 * Test method for {@link com.elf.memcached.ASCIIClient#append(java.lang.String, java.lang.Object)}.
+	 * 测试{@link com.elf.memcached.ASCIIClient#prepend(String, CharSequence)}.
 	 */
 	@Test
-	public void testAppendStringObject() {
-		Assert.assertTrue(!asciiClient.append("testAppendStringObject", "testAppendStringObject"));
-	}
-	
-	/**
-	 * Test method for {@link com.elf.memcached.ASCIIClient#append(java.lang.String, java.lang.Object, long)}.
-	 */
-	@Test
-	public void testAppendStringObjectLong() {
-		fail("Not yet implemented");
-	}
-	
-	/**
-	 * Test method for {@link com.elf.memcached.ASCIIClient#prepend(java.lang.String, java.lang.Object)}.
-	 */
-	@Test
-	public void testPrependStringObject() {
-		fail("Not yet implemented");
-	}
-	
-	/**
-	 * Test method for {@link com.elf.memcached.ASCIIClient#prepend(java.lang.String, java.lang.Object, long)}.
-	 */
-	@Test
-	public void testPrependStringObjectLong() {
-		fail("Not yet implemented");
-	}
-	
-	/**
-	 * Test method for {@link com.elf.memcached.ASCIIClient#get(java.lang.String)}.
-	 */
-	@Test
-	public void testGet() {
-		fail("Not yet implemented");
-	}
-	
-	/**
-	 * Test method for {@link com.elf.memcached.ASCIIClient#gets(java.lang.String[])}.
-	 */
-	@Test
-	public void testGets() {
-		fail("Not yet implemented");
-	}
-	
-	/**
-	 * Test method for {@link com.elf.memcached.ASCIIClient#delete(java.lang.String)}.
-	 */
-	@Test
-	public void testDelete() {
-		fail("Not yet implemented");
-	}
-	
-	/**
-	 * Test method for {@link com.elf.memcached.ASCIIClient#incr(java.lang.String)}.
-	 */
-	@Test
-	public void testIncrString() {
-		fail("Not yet implemented");
-	}
-	
-	/**
-	 * Test method for {@link com.elf.memcached.ASCIIClient#incr(java.lang.String, long)}.
-	 */
-	@Test
-	public void testIncrStringLong() {
-		fail("Not yet implemented");
-	}
-	
-	/**
-	 * Test method for {@link com.elf.memcached.ASCIIClient#decr(java.lang.String)}.
-	 */
-	@Test
-	public void testDecrString() {
-		fail("Not yet implemented");
-	}
-	
-	/**
-	 * Test method for {@link com.elf.memcached.ASCIIClient#decr(java.lang.String, long)}.
-	 */
-	@Test
-	public void testDecrStringLong() {
-		fail("Not yet implemented");
-	}
-	
-	/**
-	 * Test method for {@link com.elf.memcached.ASCIIClient#touch(java.lang.String, long)}.
-	 */
-	@Test
-	public void testTouch() {
-		fail("Not yet implemented");
-	}
-	
-	/**
-	 * Test method for {@link com.elf.memcached.ASCIIClient#flushAll()}.
-	 */
-	@Test
-	public void testFlushAll() {
-		fail("Not yet implemented");
-	}
-	
-	/**
-	 * Test method for {@link com.elf.memcached.ASCIIClient#flushAll(java.lang.String[])}.
-	 */
-	@Test
-	public void testFlushAllStringArray() {
-		fail("Not yet implemented");
+	public void test_prepend() {
+		// 不能直接对没有存储的key进行prepend
+		Assert.assertEquals(false, client.prepend("testPrependNotExist", "tesPrependNotExist"));
+		
+		client.add(K, "v");
+		client.prepend(K, "preFix_");
+		Assert.assertEquals("preFix_v", client.get(K));
 	}
 	
 }

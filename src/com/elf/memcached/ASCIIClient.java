@@ -83,23 +83,23 @@ public class ASCIIClient implements MemcachedClient {
 	}
 	
 	@Override
-	public boolean append(String key, Object value) {
+	public <T extends CharSequence> boolean append(String key, T value) {
 		return this.append(key, value, 0L);
 	}
 	
 	@Override
-	public boolean append(String key, Object value, long exptime) {
-		return this.storage(CommandNames.APPEND, key, value, exptime);
+	public <T extends CharSequence> boolean append(String key, T value, long exptime) {
+		return this.storage(CommandNames.APPEND, key, value.toString(), exptime);
 	}
 	
 	@Override
-	public boolean prepend(String key, Object value) {
+	public <T extends CharSequence> boolean prepend(String key, T value) {
 		return this.prepend(key, value, 0L);
 	}
 	
 	@Override
-	public boolean prepend(String key, Object value, long exptime) {
-		return this.storage(CommandNames.PREPEND, key, value, exptime);
+	public <T extends CharSequence> boolean prepend(String key, T value, long exptime) {
+		return this.storage(CommandNames.PREPEND, key, value.toString(), exptime);
 	}
 	
 	@Override
@@ -190,5 +190,5 @@ public class ASCIIClient implements MemcachedClient {
 			}
 		}
 	}
-	
+
 }
