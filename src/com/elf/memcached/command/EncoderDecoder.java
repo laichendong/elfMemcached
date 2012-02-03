@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
-import java.security.InvalidParameterException;
 import java.util.Date;
 
 /**
@@ -28,7 +27,7 @@ public final class EncoderDecoder {
 	 */
 	public static Flag mark(Object obj) {
 		Flag flag = Flag.OBJ_BIN;
-		if (obj == null){
+		if (obj == null) {
 			flag = Flag.NULL;
 		} else if ((obj instanceof byte[])) {
 			flag = Flag.BYTE_ARRY;
@@ -111,6 +110,10 @@ public final class EncoderDecoder {
 				obj = "1".equals(new String(bytes));
 				break;
 			}
+			case NUMBER: {
+				obj = new String(bytes);
+				break;
+			}
 			case DATE: {
 				obj = new Date(Long.valueOf(new String(bytes)));
 				break;
@@ -128,17 +131,21 @@ public final class EncoderDecoder {
 	}
 	
 	public static final byte[] encode(Object value, Flag flag) {
-		if (flag == Flag.NULL) {
-			throw new InvalidParameterException("flag 标志位必须不小于零");
-		}
 		byte[] bytes = new byte[0];
 		switch (flag) {
+			case NULL: {
+				bytes = encodeString("null");
+			}
 			case BYTE_ARRY: {
 				bytes = (byte[]) value;
 				break;
 			}
 			case BOOLEAN: {
 				bytes = encodeString((Boolean) value ? "1" : "0");
+				break;
+			}
+			case NUMBER: {
+				bytes = encodeString(value.toString());
 				break;
 			}
 			case DATE: {

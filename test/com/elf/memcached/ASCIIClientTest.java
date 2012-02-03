@@ -24,8 +24,8 @@ public class ASCIIClientTest {
 	 */
 	@BeforeClass
 	public static void init() {
-		MemcachedConnectionPool pool = new MemcachedConnectionPool(new String[] { "10.90.100.220:11211",
-				"10.90.100.220:11211", "10.90.100.220:11211" });
+		MemcachedConnectionPool pool = new MemcachedConnectionPool(new String[] { "10.103.20.13:11211",
+				"10.103.20.13:11211", "10.103.20.13:11211" });
 		pool.initialize();
 		client = new ASCIIClient(pool);
 	}
@@ -65,7 +65,6 @@ public class ASCIIClientTest {
 	public void test_set_exptime() throws InterruptedException {
 		Assert.assertTrue(client.set(K, "v", 1L));
 		Thread.sleep(1000);
-		System.out.println(client.get(K));
 		Assert.assertNull(client.get(K));
 	}
 	
@@ -118,11 +117,10 @@ public class ASCIIClientTest {
 	/**
 	 * 测试append到一个非字符串类的值上
 	 */
-	@Test
+	@Test(expected=IllegalStateException.class)
 	public void test_append_to_not_string_value() {
 		client.set(K, 0);
 		client.append(K, "someThing");
-		System.out.println("===" + client.get(K));
 	}
 	
 	/**
@@ -137,5 +135,33 @@ public class ASCIIClientTest {
 		client.prepend(K, "preFix_");
 		Assert.assertEquals("preFix_v", client.get(K));
 	}
+	
+	/**
+	 * 测试prepend到一个非字符串类的值上
+	 */
+	@Test(expected=IllegalStateException.class)
+	public void test_prepend_to_not_string_value() {
+		client.set(K, 0);
+		client.prepend(K, "someThing");
+	}
+	
+	@Test
+	public void test_get(){
+		client.set(K, "v");
+		Assert.assertEquals("v", client.get(K));
+	}
+	
+	@Test
+	public void test_gets(){
+		String[] keys = {K, "k1"};
+		client.set(K, "v");
+		client.set("k1", "v1");
+		
+		System.out.println(client.gets(keys) + "" + Integer.MIN_VALUE + "_" + Integer.MAX_VALUE);
+		
+		client.delete("k1");
+	}
+	
+
 	
 }

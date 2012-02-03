@@ -81,7 +81,10 @@ public class MemcachedConnection {
 	 * @return 是否存储成功
 	 */
 	public boolean storage(CommandNames commandName, String key, Object value, long exptime) {
-		//如果命令是append或prepend，则先判断是否为字符串
+		//如果命令是append或prepend，则先判断是否为CHAR_SEQUENCE
+		if((commandName == CommandNames.APPEND || commandName == CommandNames.PREPEND) && !isCharSequence(key)){
+			throw new IllegalStateException("the value stored with key [" + key + "] is not a CHAR_SEQUENCE VALUE");
+		}
 		
 		StorageCommand cmd = new StorageCommand(commandName, key, value, exptime);
 		logger.debug("send a command : " + cmd.commandString());
@@ -104,6 +107,53 @@ public class MemcachedConnection {
 		}
 	}
 	
+	/**
+	 * 判断key上存储的是否为 CHAR_SEQUENCE 值。
+	 * @param key 待验证的key
+	 * @return 如果key上的flag是CHAR_SEQUENCE，则返回true，其他所有情况返回false
+	 */
+	private boolean isCharSequence(String key) {
+		String[] keys = new String[1];
+		keys[0] = key;
+		RetrievalCommand cmd = new RetrievalCommand(CommandNames.GET, keys);
+		logger.debug("send a command : " + cmd.commandString());
+		byte[] c = cmd.commandString().getBytes();
+		OutputStream os;
+		try {
+			os = this.socket.getOutputStream();
+			os.write(c);
+			os.write(Command.RETURN.getBytes());
+			os.flush();
+			
+			BufferedInputStream bis = new BufferedInputStream(this.socket.getInputStream());
+			boolean stop = false;
+			StringBuffer sb = new StringBuffer();
+			Flag flag = Flag.NULL;
+			int index = 0;
+			while (!stop) {// 解析“响应头”
+				int b = bis.read();
+				if ((b == 32) || (b == 13)) {// 如果是空格或回车
+					if(index == 2){// flag
+						flag = Flag.fromInt(Integer.parseInt(sb.toString()));
+					}
+					
+					index++;
+					sb = new StringBuffer();
+					if (b == 13) {// 回车 “响应头”结束 \r
+						bis.read();// 读出最后的那个换行符 \n
+						stop = true;
+					}
+				} else {
+					sb.append((char) b);
+				}
+			}
+			return flag == Flag.CHAR_SEQUENCE;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
 	/**
 	 * 获取指定key上的
 	 * 

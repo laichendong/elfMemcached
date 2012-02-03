@@ -76,13 +76,45 @@ public interface MemcachedClient {
 	 */
 	public abstract boolean replace(String key, Object value, long exptime);
 	
-	public abstract <T extends CharSequence> boolean append(String key, T value);
+	/**
+	 * @param <T> CharSequence的实现类 诸如String，StringBuilder等等
+	 * @param key key 存储使用的key
+	 * @param value value 存储的value
+	 * @return 如果存储成功，则返回true，否则返回false。
+	 * @throws IllegalStateException 当append的目标不是CHAR_SEQUENCE时抛出此异常
+	 */
+	public abstract <T extends CharSequence> boolean append(String key, T value) throws IllegalStateException;
 	
-	public abstract <T extends CharSequence> boolean append(String key, T value, long exptime);
+	/**
+	 * @param <T> CharSequence的实现类 诸如String，StringBuilder等等
+	 * @param key key 存储使用的key
+	 * @param value value 存储的value
+	 * @param exptime 过期时间，单位为秒
+	 * @return 如果存储成功，则返回true，否则返回false。
+	 * @throws IllegalStateException 当append的目标不是CHAR_SEQUENCE时抛出此异常
+	 */
+	public abstract <T extends CharSequence> boolean append(String key, T value, long exptime)
+			throws IllegalStateException;
 	
-	public abstract <T extends CharSequence> boolean prepend(String key, T value);
+	/**
+	 * @param <T> CharSequence的实现类 诸如String，StringBuilder等等
+	 * @param key key 存储使用的key
+	 * @param value value 存储的value
+	 * @return 如果存储成功，则返回true，否则返回false。
+	 * @throws IllegalStateException 当append的目标不是CHAR_SEQUENCE时抛出此异常
+	 */
+	public abstract <T extends CharSequence> boolean prepend(String key, T value) throws IllegalStateException;
 	
-	public abstract <T extends CharSequence> boolean prepend(String key, T value, long exptime);
+	/**
+	 * @param <T> CharSequence的实现类 诸如String，StringBuilder等等
+	 * @param key key 存储使用的key
+	 * @param value value 存储的value
+	 * @param exptime 过期时间，单位为秒
+	 * @return 如果存储成功，则返回true，否则返回false。
+	 * @throws IllegalStateException 当append的目标不是CHAR_SEQUENCE时抛出此异常
+	 */
+	public abstract <T extends CharSequence> boolean prepend(String key, T value, long exptime)
+			throws IllegalStateException;
 	
 	public abstract Object get(String key);
 	
@@ -103,5 +135,5 @@ public interface MemcachedClient {
 	public abstract void flushAll();
 	
 	public abstract void flushAll(String... serverProfiles);
-
+	
 }

@@ -83,22 +83,22 @@ public class ASCIIClient implements MemcachedClient {
 	}
 	
 	@Override
-	public <T extends CharSequence> boolean append(String key, T value) {
+	public <T extends CharSequence> boolean append(String key, T value) throws IllegalStateException {
 		return this.append(key, value, 0L);
 	}
 	
 	@Override
-	public <T extends CharSequence> boolean append(String key, T value, long exptime) {
+	public <T extends CharSequence> boolean append(String key, T value, long exptime) throws IllegalStateException {
 		return this.storage(CommandNames.APPEND, key, value.toString(), exptime);
 	}
 	
 	@Override
-	public <T extends CharSequence> boolean prepend(String key, T value) {
+	public <T extends CharSequence> boolean prepend(String key, T value) throws IllegalStateException  {
 		return this.prepend(key, value, 0L);
 	}
 	
 	@Override
-	public <T extends CharSequence> boolean prepend(String key, T value, long exptime) {
+	public <T extends CharSequence> boolean prepend(String key, T value, long exptime) throws IllegalStateException  {
 		return this.storage(CommandNames.PREPEND, key, value.toString(), exptime);
 	}
 	
