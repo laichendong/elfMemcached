@@ -112,7 +112,7 @@ public class ASCIIClient implements MemcachedClient {
 	
 	@Override
 	public Map<String, Object> gets(String... keys) {
-		// TODO 待实现
+		// TODO 待实现  每个Key对应的
 		return null;
 	}
 	
